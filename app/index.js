@@ -4,16 +4,16 @@ const { MessengerBot, FileSessionStore, withTyping } = require('bottender');
 const { createServer } = require('bottender/restify');
 
 const config = require('./bottender.config.js').messenger;
-const { getPoliticianData } = require('./mandatoaberto_api');
+// const { getPoliticianData } = require('./mandatoaberto_api');
 
-const mapPageToAccessToken = async (pageId) => {
-  const perfilData = await getPoliticianData(pageId);
-  return perfilData.fb_access_token;
-};
+// const mapPageToAccessToken = async (pageId) => {
+//   const perfilData = await getPoliticianData(pageId);
+//   return perfilData.fb_access_token;
+// };
 
 const bot = new MessengerBot({
-  mapPageToAccessToken,
-  // accessToken: config.accessToken,
+  // mapPageToAccessToken,
+  accessToken: config.accessToken,
   appSecret: config.appSecret,
   verifyToken: config.verifyToken,
   sessionStore: new FileSessionStore(),
