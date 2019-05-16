@@ -68,10 +68,10 @@ module.exports = async (context) => {
 		console.log(error);
 		await context.sendText('Ops. Tive um erro interno. Tente novamente.'); // warning user
 
-		await help.Sentry.configureScope(async (scope) => { // sending to sentry
-			scope.setUser({ username: context.session.user.first_name });
-			scope.setExtra('state', context.state);
-			throw error;
-		});
-	} // catch
+    await help.Sentry.configureScope(async (scope) => { // sending to sentry
+      scope.setUser({ username: context.session.user.first_name });
+      scope.setExtra('state', context.state);
+      throw error;
+    });
+  } // catch
 }; // handler function

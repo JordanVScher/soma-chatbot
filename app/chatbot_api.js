@@ -1,10 +1,11 @@
 /* eslint camelcase: 0 */ // --> OFF
 /* eslint no-param-reassign: 0 */ // --> OFF
+
 const request = require('requisition');
 const queryString = require('query-string');
 
+const security_token = process.env.SECURITY_TOKEN;
 const apiUri = process.env.MANDATOABERTO_API_URL;
-const security_token = process.env.SECURITY_TOKEN_MA;
 
 module.exports = {
 	async getPoliticianData(pageId) {
