@@ -1,5 +1,5 @@
 {
-  "name": "mandatoaberto-chatbot",
+  "name": "elas-chatbot",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,6 +17,9 @@
     "fs-extra": "^7.0.0",
     "get-audio-duration": "0.0.1",
     "grpc": "^1.14.1",
+    "itsa-surveymonkey-promise": "0.0.6",
+    "jest": "^24.8.0",
+    "messaging-api-messenger": "^0.7.16",
     "nodemon": "^1.18.6",
     "promisepipe": "^3.0.0",
     "query-string": "^5.1.0",
@@ -24,11 +27,13 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "requisition": "^1.7.0",
+    "surveymonkey": "^1.1.0",
+    "util": "^0.12.0",
     "util.promisify": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^5.10.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0"
+    "eslint-plugin-import": "^2.17.2"
   }
 }

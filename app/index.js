@@ -4,16 +4,16 @@ const { MessengerBot, FileSessionStore, withTyping } = require('bottender');
 const { createServer } = require('bottender/restify');
 
 const config = require('./bottender.config.js').messenger;
-const { getPoliticianData } = require('./mandatoaberto_api');
+// const { getPoliticianData } = require('./mandatoaberto_api');
 
-const mapPageToAccessToken = async (pageId) => {
-	const perfilData = await getPoliticianData(pageId);
-	return perfilData.fb_access_token;
-};
+// const mapPageToAccessToken = async (pageId) => {
+//   const perfilData = await getPoliticianData(pageId);
+//   return perfilData.fb_access_token;
+// };
 
 const bot = new MessengerBot({
-	mapPageToAccessToken,
-	// accessToken: config.accessToken,
+	// mapPageToAccessToken,
+	accessToken: config.accessToken,
 	appSecret: config.appSecret,
 	verifyToken: config.verifyToken,
 	sessionStore: new FileSessionStore(),
@@ -32,6 +32,6 @@ const server = createServer(bot, { verifyToken: config.verifyToken });
 
 server.listen(process.env.API_PORT, () => {
 	console.log(`Server is running on ${process.env.API_PORT} port...`);
-	console.log(`App: ${process.env.APP} & Page: ${process.env.PAGE} - ${process.env.SHARE_LINK}`);
+	console.log(`App: ${process.env.APP} & Page: ${process.env.PAGE}`);
 	console.log(`MA User: ${process.env.MA_USER}`);
 });
