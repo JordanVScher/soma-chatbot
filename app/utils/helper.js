@@ -1,16 +1,23 @@
 const Sentry = require('@sentry/node');
+const moment = require('moment');
 const dialogFlow = require('apiai-promise');
 const accents = require('remove-accents');
+const validarCpf = require('validar-cpf');
 
 // Sentry - error reporting
 Sentry.init({	dsn: process.env.SENTRY_DSN, environment: process.env.ENV, captureUnhandledRejections: false });
-module.exports.Sentry = Sentry;
+moment.locale('pt-BR');
 
-// Dialogflow
-module.exports.apiai = dialogFlow(process.env.DIALOGFLOW_TOKEN);
+function sentryError(msg, err) {
+	console.log(msg, err || '');
+	if (process.env.ENV !== 'local') { Sentry.captureMessage(msg); }
+	return false;
+}
+
+// async function addChar(a, b, position) { return a.substring(0, position) + b + a.substring(position); }
 
 // separates string in the first dot on the second half of the string
-module.exports.separateString = (someString) => {
+async function separateString(someString) {
 	if (someString.trim()[someString.length - 1] !== '.') { // trying to guarantee the last char is a dot so we never use halfLength alone as the divisor
 		someString += '.'; // eslint-disable-line no-param-reassign
 	}
@@ -24,9 +31,9 @@ module.exports.separateString = (someString) => {
 	const secondString = someString.substring(dotIndex);
 
 	return { firstString, secondString };
-};
+}
 
-module.exports.formatDialogFlow = async (text) => {
+async function formatDialogFlow(text) {
 	let result = text.toLowerCase();
 	result = await result.replace(/([\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2580-\u27BF]|\uD83E[\uDD10-\uDDFF])/g, '');
 	result = await accents.remove(result);
@@ -34,4 +41,44 @@ module.exports.formatDialogFlow = async (text) => {
 		result = result.slice(0, 250);
 	}
 	return result.trim();
+}
+
+async function handleErrorApi(options, res, err) {
+	let msg = `Endereço: ${options.host}`;
+	msg += `\nPath: ${options.path}`;
+	msg += `\nQuery: ${JSON.stringify(options.query, null, 2)}`;
+	msg += `\nMethod: ${options.method}`;
+	msg += `\nMoment: ${new Date()}`;
+	if (res) msg += `\nResposta: ${JSON.stringify(res, null, 2)}`;
+	if (err) msg += `\nErro: ${err.stack}`;
+
+	console.log('----------------------------------------------', `\n${msg}`, '\n\n');
+
+	if ((res && (res.error || res.form_error)) || (!res && err)) {
+		if (process.env.ENV !== 'local') {
+			msg += `\nEnv: ${process.env.ENV}`;
+			await Sentry.captureMessage(msg);
+		}
+	}
+}
+
+async function handleRequestAnswer(response) {
+	try {
+		const res = await response.json();
+		await handleErrorApi(response.options, res, false);
+		return res;
+	} catch (error) {
+		await handleErrorApi(response.options, false, error);
+		return {};
+	}
+}
+
+module.exports = {
+	Sentry,
+	moment,
+	apiai: dialogFlow(process.env.DIALOGFLOW_TOKEN),
+	separateString,
+	formatDialogFlow,
+	handleRequestAnswer,
+	sentryError,
 };

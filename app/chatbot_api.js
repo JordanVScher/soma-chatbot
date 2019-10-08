@@ -3,204 +3,191 @@
 
 const request = require('requisition');
 const queryString = require('query-string');
+const { handleRequestAnswer } = require('./utils/helper');
 
-const security_token = process.env.SECURITY_TOKEN;
+const security_token = process.env.SECURITY_TOKEN_MA;
 const apiUri = process.env.MANDATOABERTO_API_URL;
+
 
 module.exports = {
 	async getPoliticianData(pageId) {
-		const res = await request(`${apiUri}/api/chatbot/politician?fb_page_id=${pageId}&security_token=${security_token}`);
-		const politicianData = await res.json();
-		// console.log('politicianData', politicianData);
-		return politicianData;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/politician?fb_page_id=${pageId}&security_token=${security_token}`));
+	},
+
+	async addAssistenteUser(name, email, password) {
+		return handleRequestAnswer(await request.post(`${apiUri}/api/register?security_token=${security_token}`).query({ name, email, password }));
 	},
 
 	async getPollData(pageId) {
-		const res = await request(`${apiUri}/api/chatbot/poll?fb_page_id=${pageId}&security_token=${security_token}`);
-		const pollData = await res.json();
-		// console.log('pollData', pollData);
-		return pollData;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/poll?fb_page_id=${pageId}&security_token=${security_token}`));
 	},
 
 	async postRecipient(user_id, recipient) {
 		const recipientData_qs = queryString.stringify(recipient);
-		const res = await request.post(`${apiUri}/api/chatbot/recipient?${recipientData_qs}&security_token=${security_token}&`).query({ politician_id: user_id });
-		const recipientData = await res.json();
-		// console.log('recipientData', recipientData);
-		return recipientData;
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/recipient?${recipientData_qs}&security_token=${security_token}&`).query({ politician_id: user_id }));
 	},
 
 	async postPollAnswer(fb_id, poll_question_option_id, origin) {
-		const res = await request.post(`${apiUri}/api/chatbot/poll-result?fb_id=${fb_id}&poll_question_option_id=${poll_question_option_id}&origin=${origin}&security_token=${security_token}`);
-		const pollAnswer = await res.json();
-		return pollAnswer;
+		return handleRequestAnswer(await request.post(
+			`${apiUri}/api/chatbot/poll-result?fb_id=${fb_id}&poll_question_option_id=${poll_question_option_id}&origin=${origin}&security_token=${security_token}`,
+		));
 	},
 
 	async getPollAnswer(fb_id, poll_id) {
-		const res = await request(`${apiUri}/api/chatbot/poll-result?fb_id=${fb_id}&poll_id=${poll_id}&security_token=${security_token}`);
-		const pollAnswer = await res.json();
-		return pollAnswer;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/poll-result?fb_id=${fb_id}&poll_id=${poll_id}&security_token=${security_token}`));
 	},
 
 	async getDialog(politician_id, dialog_name) {
-		const res = await request(`${apiUri}/api/chatbot/dialog?politician_id=${politician_id}&dialog_name=${dialog_name}&security_token=${security_token}`);
-		const dialog = await res.json();
-		return dialog;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/dialog?politician_id=${politician_id}&dialog_name=${dialog_name}&security_token=${security_token}`));
 	},
 
 	async getAnswer(politician_id, question_name) {
-		const res = await request(`${apiUri}/api/chatbot/answer?politician_id=${politician_id}&question_name=${question_name}&security_token=${security_token}`);
-		const question = await res.json();
-		return question;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/answer?politician_id=${politician_id}&question_name=${question_name}&security_token=${security_token}`));
 	},
 
 	async postIssue(politician_id, fb_id, message, entities, issue_active) {
 		if (issue_active === 1 || issue_active === true) {
 			message = encodeURI(message);
 			entities = JSON.stringify(entities);
-			const res = await request.post(`${apiUri}/api/chatbot/issue?politician_id=${politician_id}&fb_id=${fb_id}&message=${message}&entities=${entities}&security_token=${security_token}`);
-			const issue = await res.json();
-			// console.log('postIssue', issue);
-
-			return issue;
+			return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/issue?politician_id=${politician_id}&fb_id=${fb_id}&message=${message}&entities=${entities}&security_token=${security_token}`));
 		}
-
 		return false;
 	},
 
 	async postIssueWithoutEntities(politician_id, fb_id, message, issue_active) {
 		if (issue_active === 1 || issue_active === true) {
 			message = encodeURI(message);
-			const res = await request.post(`${apiUri}/api/chatbot/issue?politician_id=${politician_id}&fb_id=${fb_id}&message=${message}&security_token=${security_token}`);
-			const issue = await res.json();
-			// console.log('postIssueWithoutEntities', issue);
-
-			return issue;
+			return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/issue?politician_id=${politician_id}&fb_id=${fb_id}&message=${message}&security_token=${security_token}`));
 		}
-
 		return false;
 	},
 
 	async getknowledgeBase(politician_id, entities, fb_id) {
 		entities = JSON.stringify(entities);
-		const res = await request(`${apiUri}/api/chatbot/knowledge-base?politician_id=${politician_id}&entities=${entities}&fb_id=${fb_id}&security_token=${security_token}`);
-		const knowledgeBase = await res.json();
-		// console.log('getknowledgeBase', knowledgeBase);
-		return knowledgeBase;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/knowledge-base?politician_id=${politician_id}&entities=${entities}&fb_id=${fb_id}&security_token=${security_token}`));
 	},
 
 	async getknowledgeBaseByName(politician_id, entities) {
-		const res = await request(`${apiUri}/api/chatbot/knowledge-base?politician_id=${politician_id}&entities=${entities}&security_token=${security_token}`);
-		const knowledgeBase = await res.json();
-		// console.log('getknowledgeBaseByName', knowledgeBase);
-
-		return knowledgeBase;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/knowledge-base?politician_id=${politician_id}&entities=${entities}&security_token=${security_token}`));
 	},
 
 	async postPrivateReply(item, page_id, post_id, comment_id, permalink, user_id) {
-		const res = await request.post(`${apiUri}/api/chatbot/private-reply?page_id=${page_id}&item=${item}&post_id=${post_id}&comment_id=${comment_id}&permalink=${permalink}&user_id=${user_id}&security_token=${security_token}`);
-		const privateReply = await res.json();
-		// console.log('postPrivateReply', privateReply);
-		return privateReply;
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/private-reply?page_id=${page_id}&item=${item}&post_id=${post_id}&comment_id=${comment_id}&permalink=${permalink}&user_id=${user_id}&security_token=${security_token}`));
 	},
 
-	async updateBlacklistMA(fb_id, active) { // 0 -> turn off notification && 1 -> turn on notification
-		const res = await request.post(`${apiUri}/api/chatbot/blacklist?fb_id=${fb_id}&active=${active}&security_token=${security_token}`);
-		const Blacklist = await res.json();
-		return Blacklist;
+	// 0 -> turn off notification && 1 -> turn on notification
+	async updateBlacklistMA(fb_id, active) {
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/blacklist?fb_id=${fb_id}&active=${active}&security_token=${security_token}`));
 	},
 
-	async getAvailableIntents(pageId, page) { // has pagination
-		const res = await request(`${apiUri}/api/chatbot/intents/available?fb_page_id=${pageId}&page=${page}&security_token=${security_token}`);
-		const intents = await res.json();
-		return intents;
+	// has pagination
+	async getAvailableIntents(pageId, page) {
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/intents/available?fb_page_id=${pageId}&page=${page}&security_token=${security_token}`));
 	},
 
 	async getAllAvailableIntents(pageId) {
-		const res = await request(`${apiUri}/api/chatbot/intents/available?fb_page_id=${pageId}&security_token=${security_token}`);
-		const intents = await res.json();
-		return intents;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/intents/available?fb_page_id=${pageId}&security_token=${security_token}`));
+	},
+
+	async getTicketTypes() {
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/ticket/type?security_token=${security_token}`));
+	},
+
+	async getUserTickets(fb_id) {
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/ticket?security_token=${security_token}`).query({ fb_id }));
+	},
+
+	async putStatusTicket(TicketID, status) {
+		return handleRequestAnswer(await request.put(`${apiUri}/api/chatbot/ticket/${TicketID}?security_token=${security_token}`).query({ status }));
+	},
+
+	async putAddMsgTicket(TicketID, message) {
+		return handleRequestAnswer(await request.put(`${apiUri}/api/chatbot/ticket/${TicketID}?security_token=${security_token}`).query({ message }));
+	},
+
+	async postNewTicket(chatbot_id, fb_id, type_id, data, message = '') {
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/ticket?security_token=${security_token}`).query({
+			chatbot_id, fb_id, type_id, message, data,
+		}));
 	},
 
 	async logFlowChange(recipient_fb_id, politician_id, payload, human_name) {
 		const d = new Date();
-		const res = await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`).query(
-			{
-				timestamp: d.toGMTString(),
-				recipient_fb_id,
-				politician_id,
-				action_id: 1,
-				payload,
-				human_name,
-			},
-		);
-		const log = await res.json();
-		// // console.log('logFlowChange', log);
-		return log;
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}`).query({
+			timestamp: d.toGMTString(),
+			recipient_fb_id,
+			politician_id,
+			action_id: 1,
+			payload,
+			human_name,
+		}));
 	},
 
 	async logAnsweredPoll(recipient_fb_id, politician_id, field_id) {
 		const d = new Date();
-		const res = await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`).query(
-			{
-				timestamp: d.toGMTString(),
-				recipient_fb_id,
-				politician_id,
-				action_id: 2,
-				field_id,
-			},
-		);
-		const log = await res.json();
-		// // console.log('logAnsweredPoll', log);
-		return log;
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}`).query({
+			timestamp: d.toGMTString(),
+			recipient_fb_id,
+			politician_id,
+			action_id: 2,
+			field_id,
+		}));
 	},
 
 	async logAskedEntity(recipient_fb_id, politician_id, field_id) {
 		const d = new Date();
-		const res = await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`).query(
-			{
+		return handleRequestAnswer(await request
+			.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`)
+			.query({
 				timestamp: d.toGMTString(),
 				recipient_fb_id,
 				politician_id,
 				action_id: 5,
 				field_id,
-			},
-		);
-		const log = await res.json();
-		// // console.log('logAskedEntity', log);
-		return log;
+			}));
 	},
 
+	// action_id should be 3 for ACTIVATED_NOTIFICATIONS and 4 for DEACTIVATED_NOTIFICATIONS
 	async logNotification(recipient_fb_id, politician_id, action_id) {
-		// action_id should be 3 for ACTIVATED_NOTIFICATIONS and 4 for DEACTIVATED_NOTIFICATIONS
 		const d = new Date();
-		const res = await request.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`).query(
-			{
+		return handleRequestAnswer(await request
+			.post(`${apiUri}/api/chatbot/log?security_token=${security_token}&`)
+			.query({
 				timestamp: d.toGMTString(),
 				recipient_fb_id,
 				politician_id,
 				action_id,
-			},
-		);
-		const log = await res.json();
-		// // console.log('logNotification', log);
-		return log;
+			}));
 	},
 
-	// // console.log(await MaAPI.getLogAction()); // print possible log actions
 	async getLogAction() {
-		const res = await request(`${apiUri}/api/chatbot/log/actions?security_token=${security_token}`);
-		const log = await res.json();
-		return log;
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/log/actions?security_token=${security_token}`));
 	},
 
 	async setIntentStatus(politician_id, recipient_fb_id, intent, entity_is_correct) {
 		if (intent && intent.id) {
-			const res = await request.post(`${apiUri}/api/chatbot/politician/${politician_id}/intents/${intent.id}/stats?entity_is_correct=${entity_is_correct}&recipient_fb_id=${recipient_fb_id}&security_token=${security_token}`);
-			const log = await res.json();
-			// // console.log('setIntentStatus', log);
-			return log;
+			return handleRequestAnswer(await request.post(
+				`${apiUri}/api/chatbot/politician/${politician_id}/intents/${
+					intent.id
+				}/stats?entity_is_correct=${entity_is_correct}&recipient_fb_id=${recipient_fb_id}&security_token=${security_token}`,
+			));
 		}
 		return false;
+	},
+
+	async getPendinQuestion(fb_id, type = 'preparatory') {
+		return handleRequestAnswer(await request.get(`${apiUri}/api/chatbot/questionnaire/pending?security_token=${security_token}`).query({ fb_id, type }));
+	},
+
+	async postQuizAnswer(fb_id, type, code, answer_value) {
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/questionnaire/answer?security_token=${security_token}`).query({
+			fb_id, type, code, answer_value,
+		}));
+	},
+
+	async resetQuiz(fb_id, type) {
+		return handleRequestAnswer(await request.post(`${apiUri}/api/chatbot/questionnaire/reset?security_token=${security_token}`).query({
+			fb_id, type,
+		}));
 	},
 };

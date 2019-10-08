@@ -1,6 +1,9 @@
 function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 	return {
 		state: {
+			userTickets: { tickets: [] },
+			userTicketTypes: [],
+			ticketTypes: { ticket_types: [{ id: 1, name: 'Tipo 1' }, { name: 'Tipo 2', id: 2 }] },
 			user: {},
 			dialog,
 			lastQRpayload: payload,
@@ -42,6 +45,9 @@ function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 function postbackContext(payload, title, dialog = 'prompt', lastActivity = new Date()) {
 	return {
 		state: {
+			userTickets: { tickets: [] },
+			userTicketTypes: [],
+			ticketTypes: { ticket_types: [{ id: 1, name: 'Tipo 1' }, { name: 'Tipo 2', id: 2 }] },
 			user: {},
 			dialog,
 			lastPBpayload: payload,
@@ -84,6 +90,9 @@ function postbackContext(payload, title, dialog = 'prompt', lastActivity = new D
 function textContext(text, dialog, lastActivity = new Date()) {
 	return {
 		state: {
+			userTickets: { tickets: [] },
+			userTicketTypes: [],
+			ticketTypes: { ticket_types: [{ id: 1, name: 'Tipo 1' }, { name: 'Tipo 2', id: 2 }] },
 			user: {},
 			dialog,
 			politicianData: {

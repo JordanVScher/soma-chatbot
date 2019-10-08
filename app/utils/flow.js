@@ -1,15 +1,25 @@
 module.exports = {
-	avatarImage: 'https://www.telegraph.co.uk/content/dam/news/2016/09/08/107667228_beech-tree-NEWS_trans_NvBQzQNjv4BqplGOf-dgG3z4gg9owgQTXEmhb5tXCQRHAvHRWfzHzHk.jpg?imwidth=450',
-	getStarted: 'oi sou o bot',
+	avatarImage: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Symbol_support_vote.png',
+	getStarted: 'Olá, sou o Bot',
+	share: {
+		txt1: 'Encaminhe nosso bot!',
+		cardData: {
+			title: 'Bot',
+			subtitle: 'Bot',
+			image_url: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Symbol_support_vote.png',
+			item_url: 'https://www.facebook.com',
+		},
+	},
 	greetings: {
-		text1: 'Hi, sou o bot',
-		text2: 'Faço isso e aquilo',
+		text1: 'Olá, <USERNAME>!',
+		text2: 'Sou o assistente digital',
 	},
 	mainMenu: {
-		text1: 'on mainMenu',
+		text1: 'Fim de fluxo',
+		// text1: 'Você pode me fazer uma pergunta a qualquer momento ou escolher uma das opções abaixo:',
 	},
 	issueText: {
-		success: 'Obrigado por sua mensagem',
+		success: 'Você me pegou. Preciso pensar e te retorno em breve.',
 		failure: 'Não consegui salvar a mensagem',
 	},
 };

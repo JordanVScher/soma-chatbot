@@ -1,5 +1,5 @@
 {
-  "name": "elas-chatbot",
+  "name": "soma-chatbot",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29,7 +29,8 @@
     "requisition": "^1.7.0",
     "surveymonkey": "^1.1.0",
     "util": "^0.12.0",
-    "util.promisify": "^1.0.0"
+    "util.promisify": "^1.0.0",
+    "validar-cpf": "^2.1.1"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
