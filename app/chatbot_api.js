@@ -7,7 +7,7 @@ const { handleRequestAnswer } = require('./utils/helper');
 
 const security_token = process.env.SECURITY_TOKEN_MA;
 const apiUri = process.env.MANDATOABERTO_API_URL;
-
+const apiKey = process.env.API_KEY;
 
 module.exports = {
 	async getPoliticianData(pageId) {
@@ -16,6 +16,10 @@ module.exports = {
 
 	async addAssistenteUser(name, email, password) {
 		return handleRequestAnswer(await request.post(`${apiUri}/api/register?security_token=${security_token}`).query({ name, email, password }));
+	},
+
+	async addFBKeysToAssistenteUser(id, fb_page_id, fb_page_access_token) {
+		return handleRequestAnswer(await request.put(`${apiUri}/api/politician/${id}?api_key=${apiKey}`).query({ fb_page_id, fb_page_access_token }));
 	},
 
 	async getPollData(pageId) {
