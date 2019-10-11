@@ -1,4 +1,5 @@
 const assistenteAPI = require('./chatbot_api');
+const { createIssue } = require('./utils/send_issue');
 const flow = require('./utils/flow');
 const help = require('./utils/helper');
 const dialogs = require('./utils/dialogs');
@@ -53,6 +54,19 @@ module.exports = async (context) => {
 			// await context.sendText(flow.share.txt1);
 			// await attach.sendShare(context, flow.share.cardData);
 			// await dialogs.sendMainMenu(context);
+			break;
+		case 'createIssueDirect':
+			await createIssue(context);
+			break;
+		case 'notificationOn':
+			await assistenteAPI.updateBlacklistMA(context.session.user.id, 1);
+			await assistenteAPI.logNotification(context.session.user.id, context.state.politicianData.user_id, 3);
+			await context.sendText(flow.notifications.on);
+			break;
+		case 'notificationOff':
+			await assistenteAPI.updateBlacklistMA(context.session.user.id, 0);
+			await assistenteAPI.logNotification(context.session.user.id, context.state.politicianData.user_id, 4);
+			await context.sendText(flow.notifications.off);
 			break;
 		} // end switch case
 	} catch (error) {
