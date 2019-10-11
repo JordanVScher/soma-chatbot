@@ -43,18 +43,16 @@ module.exports = async (context) => {
 		switch (context.state.dialog) {
 		case 'greetings':
 			await context.sendImage(flow.avatarImage);
-			await context.sendText(flow.greetings.text1.replace('<USERNAME>', context.session.user.first_name));
-			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text2]);
+			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await dialogs.sendMainMenu(context);
-			await context.setState({ sendShare: true });
 			break;
 		case 'mainMenu':
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'compartilhar':
-			await context.sendText(flow.share.txt1);
-			await attach.sendShare(context, flow.share.cardData);
-			await dialogs.sendMainMenu(context);
+			// await context.sendText(flow.share.txt1);
+			// await attach.sendShare(context, flow.share.cardData);
+			// await dialogs.sendMainMenu(context);
 			break;
 		} // end switch case
 	} catch (error) {

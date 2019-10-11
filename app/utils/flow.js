@@ -1,6 +1,6 @@
 module.exports = {
-	avatarImage: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Symbol_support_vote.png',
-	getStarted: 'Olá, sou o Bot',
+	avatarImage: 'https://gallery.mailchimp.com/926cb477483bcd8122304bc56/images/b35bd3b6-a0a0-4534-9d54-0f864dd172d3.jpg',
+	getStarted: 'Olá! Eu sou o Robô do SO+MA Educação, e vou te ajudar nas suas duvidas sobre o programa.',
 	share: {
 		txt1: 'Encaminhe nosso bot!',
 		cardData: {
@@ -11,15 +11,13 @@ module.exports = {
 		},
 	},
 	greetings: {
-		text1: 'Olá, <USERNAME>!',
-		text2: 'Sou o assistente digital',
+		text1: 'Olá! Eu sou o Robô do SO+MA Educação, e vou te ajudar nas suas duvidas sobre o programa.',
 	},
 	mainMenu: {
-		text1: 'Fim de fluxo',
-		// text1: 'Você pode me fazer uma pergunta a qualquer momento ou escolher uma das opções abaixo:',
+		text1: 'Se tiver alguma duvida é só me enviar uma mensagem',
 	},
 	issueText: {
-		success: 'Você me pegou. Preciso pensar e te retorno em breve.',
-		failure: 'Não consegui salvar a mensagem',
+		success: 'Eu sou um robô e estou aprendendo! Não entendi sua mensagem.',
+		failure: 'Eu sou um robô e estou aprendendo! Não entendi sua mensagem',
 	},
 };
