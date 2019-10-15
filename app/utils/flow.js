@@ -21,7 +21,7 @@ module.exports = {
 		failure: 'Eu sou um robô e estou aprendendo! Não entendi sua mensagem',
 	},
 	notifications: {
-		on: 'Você quem manda. Não estarei mais te enviando nenhuma notificação. Se quiser voltar a receber nossas novidades, clique na opção "Ativar Notificações" no menu abaixo. ⬇️',
-		off: 'Legal! Estarei te interando das novidades! Se quiser parar de receber nossas novidades, clique na opção "Desativar Notificações" no menu abaixo. ⬇️',
+		on: 'Legal! Estarei te interando das novidades! Se quiser parar de receber nossas novidades, clique na opção "Parar Notificações 🛑" no menu abaixo. ⬇️',
+		off: 'Você quem manda. Não estarei mais te enviando nenhuma notificação. Se quiser voltar a receber nossas novidades, clique na opção "Ligar Notificações 👌" no menu abaixo. ⬇️',
 	},
 };
