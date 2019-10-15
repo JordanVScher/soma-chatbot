@@ -11,7 +11,7 @@ const client = MessengerClient.connect({
 });
 
 async function createGetStarted() { // eslint-disable-line no-unused-vars
-	console.log(await client.setGetStarted('aaaa'));
+	console.log(await client.setGetStarted('greetings'));
 	console.log(await client.setGreeting([{
 		locale: 'default',
 		text: flow.getStarted,
