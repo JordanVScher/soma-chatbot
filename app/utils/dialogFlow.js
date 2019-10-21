@@ -42,6 +42,12 @@ async function getEntity(res) {
 	return result || {};
 }
 
+async function getExistingRes(res) {
+	let result = null;
+	res.forEach((e) => { if (e !== null && result === null) result = e; });
+	return result;
+}
+
 async function checkPosition(context) {
 	await context.setState({ dialog: 'prompt' });
 	console.log('intentName', context.state.intentName);
@@ -54,7 +60,9 @@ async function checkPosition(context) {
 		break;
 	default: // default acts for every intent - position on MA
 		// getting knowledge base. We send the complete answer from dialogflow
-		await context.setState({ knowledge: await MaAPI.getknowledgeBase(context.state.politicianData.user_id, context.state.apiaiResp, context.session.user.id) });
+		await context.setState(
+			{ knowledge: await MaAPI.getknowledgeBase(context.state.politicianData.user_id, await getExistingRes(context.state.apiaiResp), context.session.user.id) },
+		);
 		console.log('knowledge', context.state.knowledge);
 
 		// check if there's at least one answer in knowledge_base
