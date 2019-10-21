@@ -57,6 +57,7 @@ module.exports = async (context) => {
 			break;
 		case 'createIssueDirect':
 			await createIssue(context);
+			await dialogs.sendMainMenu(context);
 			break;
 		case 'notificationOn':
 			await assistenteAPI.updateBlacklistMA(context.session.user.id, 1);
