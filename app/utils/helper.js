@@ -1,7 +1,7 @@
 const Sentry = require('@sentry/node');
 const moment = require('moment');
 const accents = require('remove-accents');
-const validarCpf = require('validar-cpf');
+// const validarCpf = require('validar-cpf');
 
 // Sentry - error reporting
 Sentry.init({	dsn: process.env.SENTRY_DSN, environment: process.env.ENV, captureUnhandledRejections: false });
@@ -72,6 +72,10 @@ async function handleRequestAnswer(response) {
 	}
 }
 
+function getRandomArray(array) {
+	return array[Math.floor((Math.random() * array.length))];
+}
+
 module.exports = {
 	Sentry,
 	moment,
@@ -79,4 +83,5 @@ module.exports = {
 	formatDialogFlow,
 	handleRequestAnswer,
 	sentryError,
+	getRandomArray,
 };

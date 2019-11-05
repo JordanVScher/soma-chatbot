@@ -14,10 +14,16 @@ module.exports = {
 		text1: 'Olá! Eu sou o Robô do SO+MA Educação, e vou te ajudar nas suas duvidas sobre o programa.',
 	},
 	mainMenu: {
-		text1: 'Se tiver alguma duvida é só me enviar uma mensagem',
+		text1: [
+			'Se tiver alguma dúvida é só me enviar uma mensagem ;)',
+			'Me mande uma mensagem caso tenha alguma dúvida =)',
+			'Posso ajudar com mais alguma coisa ? É só me enviar uma mensagem ;)',
+		],
 	},
 	issueText: {
-		success: 'Eu sou um robô e estou aprendendo! Não entendi sua mensagem.',
+		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',
+			'Sou um robô e meus algoritmos ainda estão aprendendo. Não entendi sua mensagem, mas logo te respondo =)',
+		],
 		failure: 'Eu sou um robô e estou aprendendo! Não entendi sua mensagem',
 	},
 	notifications: {
