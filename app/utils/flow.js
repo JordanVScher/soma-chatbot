@@ -17,7 +17,7 @@ module.exports = {
 		text1: [
 			'Se tiver alguma dúvida é só me enviar uma mensagem ;)',
 			'Me mande uma mensagem caso tenha alguma dúvida =)',
-			'Posso ajudar com mais alguma coisa ? É só me enviar uma mensagem ;)',
+			'Posso ajudar com mais alguma coisa? É só me enviar uma mensagem ;)',
 		],
 		menuOptions: ['Meus Pontos'],
 		menuPostback: ['myPoints'],

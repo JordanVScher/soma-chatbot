@@ -90,6 +90,22 @@ async function buildRecipientObj(context) {
 	return state;
 }
 
+async function buildSubtitle(product, userPoints) {
+	let res = '';
+
+	if (product.points) res += `Pontos: ${product.points}\n`;
+	if (userPoints < product.points) {
+		const missingPoints = product.points - userPoints;
+		if (missingPoints === 1) {
+			res += `Te falta só ${missingPoints} ponto\n`;
+		} else if (missingPoints > 1) {
+			res += `Te faltam ${missingPoints} pontos\n`;
+		}
+	}
+	if (product.description) res += product.description;
+
+	return res;
+}
 module.exports = {
 	Sentry,
 	moment,
@@ -99,4 +115,5 @@ module.exports = {
 	sentryError,
 	getRandomArray,
 	buildRecipientObj,
+	buildSubtitle,
 };

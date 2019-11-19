@@ -1,4 +1,5 @@
 const { sentryError } = require('./helper');
+const { buildSubtitle } = require('./helper');
 
 function capQR(text) {
 	let result = text;
@@ -159,11 +160,11 @@ async function sendUserProductsCarrousel(context, productList, userPoints) {
 
 	for (let i = 0; i < productList.length; i++) {
 		const e = productList[i];
-
 		if (userPoints >= e.points) {
+			const subtitle = await buildSubtitle(e, userPoints);
 			elements.push({
 				title: e.name,
-				subtitle: `Pontos: ${e.points}`,
+				subtitle,
 				image_url: e.image,
 				buttons: [{ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` }],
 			});
@@ -183,10 +184,7 @@ async function sendAllProductsCarrousel(context, productList, userPoints) {
 
 	for (let i = 0; i < productList.length; i++) {
 		const e = productList[i];
-
-		let subtitle = `Pontos: ${e.points}`;
-		if (userPoints < e.points) subtitle += `\nTe falta: ${e.points - userPoints} ponto(s)`;
-
+		const subtitle = await buildSubtitle(e, userPoints);
 		const buttons = [];
 		if (userPoints >= e.points) {
 			buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}`	});

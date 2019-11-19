@@ -33,7 +33,7 @@ module.exports = async (context) => {
 
 		switch (context.state.dialog) {
 		case 'greetings':
-			await context.setState({ userPoints: 1, userKilos: 40, cheapestProduct: 50 });
+			await context.setState({ userPoints: 30, userKilos: 40, cheapestProduct: 50 });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
