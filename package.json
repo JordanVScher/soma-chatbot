@@ -4,7 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "nodemon app/index.js",
-    "start": "node app/index.js"
+    "start": "node app/index.js",
+    "test": "jest --detectOpenHandles",
+    "pm2_add": "pm2 start app/index.js  --name \"soma-homol\"",
+    "restart": "pm2 restart \"soma-homol\" --update-env",
+    "logs": "pm2 logs \"soma-homol\" --lines 1000",
+    "stop": "pm2 stop \"soma-homol\"",
+    "remove": "pm2 remove \"soma-homol\""
   },
   "dependencies": {
     "@sentry/node": "^4.2.3",

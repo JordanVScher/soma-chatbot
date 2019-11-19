@@ -5,22 +5,12 @@ const help = require('./utils/helper');
 const dialogs = require('./utils/dialogs');
 const attach = require('./utils/attach');
 const DF = require('./utils/dialogFlow');
+const { mockProduct } = require('./utils/product');
 
 module.exports = async (context) => {
 	try {
-		// let user = await getUser(context)
-		// we reload politicianData on every useful event
-		await context.setState({ politicianData: await assistenteAPI.getPoliticianData(context.event.rawEvent.recipient.id) });
-		// console.log(context.state.politicianData);
-
-		// we update context data at every interaction that's not a comment or a post
-		await assistenteAPI.postRecipient(context.state.politicianData.user_id, {
-			fb_id: context.session.user.id,
-			name: `${context.session.user.first_name} ${context.session.user.last_name}`,
-			origin_dialog: 'greetings',
-			picture: context.session.user.profile_pic,
-			// session: JSON.stringify(context.state),
-		});
+		await context.setState({ chatbotData: await assistenteAPI.getChatbotData(context.event.rawEvent.recipient.id) });
+		await assistenteAPI.postRecipient(context.state.chatbotData.user_id, await help.buildRecipientObj(context));
 
 		if (context.event.isPostback) {
 			await context.setState({ lastPBpayload: context.event.postback.payload });
@@ -29,12 +19,12 @@ module.exports = async (context) => {
 			} else {
 				await context.setState({ dialog: context.state.lastPBpayload });
 			}
-			await assistenteAPI.logFlowChange(context.session.user.id, context.state.politicianData.user_id,
+			await assistenteAPI.logFlowChange(context.session.user.id, context.state.chatbotData.user_id,
 				context.event.postback.payload, context.event.postback.title);
 		} else if (context.event.isQuickReply) {
 			await context.setState({ lastQRpayload: context.event.quickReply.payload });
 			await context.setState({ dialog: context.state.lastQRpayload });
-			await assistenteAPI.logFlowChange(context.session.user.id, context.state.politicianData.user_id,
+			await assistenteAPI.logFlowChange(context.session.user.id, context.state.chatbotData.user_id,
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
@@ -43,12 +33,23 @@ module.exports = async (context) => {
 
 		switch (context.state.dialog) {
 		case 'greetings':
+			await context.setState({ userPoints: 1, userKilos: 40, cheapestProduct: 50 });
+			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'mainMenu':
 			await dialogs.sendMainMenu(context);
+			break;
+		case 'myPoints':
+			await dialogs.myPoints(context);
+			break;
+		case 'viewUserProducts':
+			await dialogs.viewUserProducts(context);
+			break;
+		case 'viewAllProducts':
+			await dialogs.viewAllProducts(context);
 			break;
 		case 'compartilhar':
 			// await context.sendText(flow.share.txt1);
@@ -61,12 +62,12 @@ module.exports = async (context) => {
 			break;
 		case 'notificationOn':
 			await assistenteAPI.updateBlacklistMA(context.session.user.id, 1);
-			await assistenteAPI.logNotification(context.session.user.id, context.state.politicianData.user_id, 3);
+			await assistenteAPI.logNotification(context.session.user.id, context.state.chatbotData.user_id, 3);
 			await context.sendText(flow.notifications.on);
 			break;
 		case 'notificationOff':
 			await assistenteAPI.updateBlacklistMA(context.session.user.id, 0);
-			await assistenteAPI.logNotification(context.session.user.id, context.state.politicianData.user_id, 4);
+			await assistenteAPI.logNotification(context.session.user.id, context.state.chatbotData.user_id, 4);
 			await context.sendText(flow.notifications.off);
 			break;
 		} // end switch case

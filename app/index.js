@@ -5,16 +5,17 @@ const { createServer } = require('bottender/restify');
 const requests = require('../requests');
 
 const config = require('./bottender.config.js').messenger;
-// const { getPoliticianData } = require('./chatbot_api');
+const { getChatbotData } = require('./chatbot_api');
 
-// const mapPageToAccessToken = async (pageId) => {
-// 	const perfilData = await getPoliticianData(pageId);
-// 	return perfilData.fb_access_token;
-// };
+const mapPageToAccessToken = async (pageId) => {
+	if (process.env.ENV === 'local') { return config.accessToken; }
+	const perfilData = await getChatbotData(pageId);
+	return perfilData.fb_access_token;
+};
 
 const bot = new MessengerBot({
-	// mapPageToAccessToken,
-	accessToken: config.accessToken,
+	mapPageToAccessToken,
+	// accessToken: config.accessToken,
 	appSecret: config.appSecret,
 	verifyToken: config.verifyToken,
 	sessionStore: new FileSessionStore(),

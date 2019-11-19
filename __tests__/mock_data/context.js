@@ -7,7 +7,7 @@ function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 			user: {},
 			dialog,
 			lastQRpayload: payload,
-			politicianData: {
+			chatbotData: {
 				user_id: 2000,
 				use_dialogflow: 1,
 			},
@@ -51,7 +51,7 @@ function postbackContext(payload, title, dialog = 'prompt', lastActivity = new D
 			user: {},
 			dialog,
 			lastPBpayload: payload,
-			politicianData: {
+			chatbotData: {
 				user_id: 2000,
 				use_dialogflow: 1,
 			},
@@ -95,7 +95,7 @@ function textContext(text, dialog, lastActivity = new Date()) {
 			ticketTypes: { ticket_types: [{ id: 1, name: 'Tipo 1' }, { name: 'Tipo 2', id: 2 }] },
 			user: {},
 			dialog,
-			politicianData: {
+			chatbotData: {
 				user_id: 2000,
 				use_dialogflow: 1,
 			},

@@ -75,6 +75,20 @@ async function handleRequestAnswer(response) {
 function getRandomArray(array) {
 	return array[Math.floor((Math.random() * array.length))];
 }
+async function buildRecipientObj(context) {
+	const state = {
+		fb_id: context.session.user.id,
+		name: `${context.session.user.first_name} ${context.session.user.last_name}`,
+		picture: context.session.user.profile_pic,
+		// origin_dialog: 'greetings',
+		// session: JSON.stringify(context.state),
+	};
+
+	if (context.state.gotAluna && context.state.gotAluna.email) state.email = context.state.alunaMail;
+	if (context.state.gotAluna && context.state.gotAluna.cpf) state.cpf = context.state.cpf;
+
+	return state;
+}
 
 module.exports = {
 	Sentry,
@@ -84,4 +98,5 @@ module.exports = {
 	handleRequestAnswer,
 	sentryError,
 	getRandomArray,
+	buildRecipientObj,
 };

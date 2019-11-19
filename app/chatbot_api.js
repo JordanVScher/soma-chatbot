@@ -10,7 +10,7 @@ const apiUri = process.env.MANDATOABERTO_API_URL;
 const apiKey = process.env.API_KEY;
 
 module.exports = {
-	async getPoliticianData(pageId) {
+	async getChatbotData(pageId) {
 		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/politician?fb_page_id=${pageId}&security_token=${security_token}`));
 	},
 

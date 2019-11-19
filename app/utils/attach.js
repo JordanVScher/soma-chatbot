@@ -1,6 +1,4 @@
-const { moment } = require('./helper');
 const { sentryError } = require('./helper');
-const flow = require('./flow');
 
 function capQR(text) {
 	let result = text;
@@ -136,7 +134,7 @@ async function sendShare(context, cardData) {
 
 async function sendMsgFromAssistente(context, code, defaultMsgs) {
 	try {
-		const answers = context.state && context.state.politicianData && context.state.politicianData.answers ? context.state.politicianData.answers : false;
+		const answers = context.state && context.state.chatbotData && context.state.chatbotData.answers ? context.state.chatbotData.answers : false;
 		let msgToSend;
 
 		if (answers && answers.length > 0) {
@@ -156,7 +154,75 @@ async function sendMsgFromAssistente(context, code, defaultMsgs) {
 	}
 }
 
+async function sendUserProductsCarrousel(context, productList, userPoints) {
+	const elements = [];
+
+	for (let i = 0; i < productList.length; i++) {
+		const e = productList[i];
+
+		if (userPoints >= e.points) {
+			elements.push({
+				title: e.name,
+				subtitle: `Pontos: ${e.points}`,
+				image_url: e.image,
+				buttons: [{ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` }],
+			});
+		}
+	}
+
+	await context.sendAttachment({
+		type: 'template',
+		payload: {
+			template_type: 'generic',
+			elements,
+		},
+	});
+}
+async function sendAllProductsCarrousel(context, productList, userPoints) {
+	const elements = [];
+
+	for (let i = 0; i < productList.length; i++) {
+		const e = productList[i];
+
+		let subtitle = `Pontos: ${e.points}`;
+		if (userPoints < e.points) subtitle += `\nTe falta: ${e.points - userPoints} ponto(s)`;
+
+		const buttons = [];
+		if (userPoints >= e.points) {
+			buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}`	});
+		} else {
+			buttons.push({ type: 'postback', title: '<BOTAO OBRIGATORIO>', payload: 'viewAllProducts' });
+		}
+
+		elements.push({
+			title: e.name,
+			subtitle,
+			image_url: e.image,
+			buttons,
+		});
+	}
+
+	await context.sendAttachment({
+		type: 'template',
+		payload: {
+			template_type: 'generic',
+			elements,
+		},
+	});
+}
+
 
 module.exports = {
-	sendShare, getErrorQR, getVoltarQR, getQR, sendSequenceMsgs, sendCardWithLink, cardLinkNoImage, capQR, buildButton, sendMsgFromAssistente,
+	sendShare,
+	getErrorQR,
+	getVoltarQR,
+	getQR,
+	sendSequenceMsgs,
+	sendCardWithLink,
+	cardLinkNoImage,
+	capQR,
+	buildButton,
+	sendMsgFromAssistente,
+	sendUserProductsCarrousel,
+	sendAllProductsCarrousel,
 };

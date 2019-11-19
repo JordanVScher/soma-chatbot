@@ -62,7 +62,7 @@ async function checkPosition(context) {
 	default: // default acts for every intent - position on MA
 		// getting knowledge base. We send the complete answer from dialogflow
 		await context.setState(
-			{ knowledge: await MaAPI.getknowledgeBase(context.state.politicianData.user_id, await getExistingRes(context.state.apiaiResp), context.session.user.id) },
+			{ knowledge: await MaAPI.getknowledgeBase(context.state.chatbotData.user_id, await getExistingRes(context.state.apiaiResp), context.session.user.id) },
 		);
 		console.log('knowledge', context.state.knowledge);
 
@@ -78,8 +78,8 @@ async function checkPosition(context) {
 }
 
 async function dialogFlow(context) {
-	console.log(`\n${context.session.user.name} digitou ${context.event.message.text} - DF Status: ${context.state.politicianData.use_dialogflow}`);
-	if (context.state.politicianData.use_dialogflow === 1) { // check if 'politician' is using dialogFlow
+	console.log(`\n${context.session.user.name} digitou ${context.event.message.text} - DF Status: ${context.state.chatbotData.use_dialogflow}`);
+	if (context.state.chatbotData.use_dialogflow === 1) { // check if 'politician' is using dialogFlow
 		await context.setState({ apiaiResp: await textRequestDF(await help.formatDialogFlow(context.state.whatWasTyped), context.session.user.id) });
 		await context.setState({ intentName: context.state.apiaiResp[0].queryResult.intent.displayName || '' }); // intent name
 		await context.setState({ resultParameters: await getEntity(context.state.apiaiResp) }); // entities

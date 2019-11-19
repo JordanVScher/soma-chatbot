@@ -19,6 +19,20 @@ module.exports = {
 			'Me mande uma mensagem caso tenha alguma dúvida =)',
 			'Posso ajudar com mais alguma coisa ? É só me enviar uma mensagem ;)',
 		],
+		menuOptions: ['Meus Pontos'],
+		menuPostback: ['myPoints'],
+	},
+	myPoints: {
+		noPoints: 'Você ainda não tem nenhum ponto! ):',
+		showPoints: 'Você já nos enviou o total de <KILOS> Kg(s), e com isso acumulou o total de <POINTS> pontos =)',
+		hasEnough: 'Você já pode realizar algumas trocas, deseja ver o que já é possível trocar?',
+		notEnough: 'Vc esta quase chegando, com <POINTS> pontos você já consegue fazer uma troca.',
+		menuOptions: ['Sim', 'Agora não', 'Ver Todos'],
+		menuPostback: ['viewUserProducts', 'mainMenu', 'viewAllProducts'],
+	},
+	notEnough: {
+		menuOptions: ['Entendi', 'Ver Todos'],
+		menuPostback: ['mainMenu', 'viewAllProducts'],
 	},
 	issueText: {
 		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',
