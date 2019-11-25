@@ -29,6 +29,9 @@ module.exports = async (context) => {
 				await context.setState({ dialog: 'productQtd', productQtd: context.state.lastQRpayload.replace('productQtd', '') });
 		} else if (context.state.lastQRpayload.slice(0, 10) === 'productBuy') {
 			await dialogs.productBuyHelp(context, context.state.lastQRpayload);
+		} else if (context.state.lastQRpayload.slice(0, 14) === 'productPageQtd') {
+			await context.setState({ dialog: 'productPageQtd', productPage: context.state.lastQRpayload.replace('productPageQtd', '') })
+			await context.setState({ productPage: parseInt(context.state.productPage, 10)	})
 		} else {
 			await context.setState({ dialog: context.state.lastQRpayload });
 		}
@@ -41,7 +44,7 @@ module.exports = async (context) => {
 
 		switch (context.state.dialog) {
 		case 'greetings':
-			await context.setState({ userPoints: 30, userKilos: 40 });
+			await context.setState({ userPoints: 100, userKilos: 40 });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
@@ -60,10 +63,17 @@ module.exports = async (context) => {
 			await dialogs.viewAllProducts(context);
 			break;
 		case 'productBuy':
+			// await context.setState({ userPoints: 100, userKilos: 40 });
+			// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
+			// await context.setState({ dialog: 'productBuy', productId: 1 });
 			await dialogs.productBuy(context);
 			break;
 		case 'productQtd':
 			await dialogs.productQtd(context);
+			break;
+		case 'productPageQtd': // pagination
+			await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
+			await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
 			break;
 		case 'productNo':
 			const newBtns = JSON.parse(JSON.stringify(flow.productNo));

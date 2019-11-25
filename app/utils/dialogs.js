@@ -93,8 +93,9 @@ async function productBuy(context) {
 	const textToSend = await help.buildProductView(context.state.desiredProduct)
 	if (textToSend) await context.sendText(textToSend);
 	await context.setState({ desiredProductQtd: Math.floor(context.state.userPoints / context.state.desiredProduct.points)});
-	await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points) });
-	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name), await attach.buildQtdButtons(context.state.qtdButtons));
+	await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points), paginationNumber: 0 });
+	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name), 
+		await attach.buildQtdButtons(context.state.qtdButtons, 9, 1));
 }
 
 async function productQtd(context) {

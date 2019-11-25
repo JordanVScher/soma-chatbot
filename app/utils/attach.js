@@ -1,5 +1,6 @@
 const { sentryError } = require('./helper');
 const { buildSubtitle } = require('./helper');
+const { paginate } = require('./helper');
 
 function capQR(text) {
 	let result = text;
@@ -209,16 +210,25 @@ async function sendAllProductsCarrousel(context, productList, userPoints) {
 	});
 }
 
-async function buildQtdButtons(buttons) {
+/**
+ * Builds obj with the quick replies array for the number of units of a product for the user to choose. Adds pagination as needed.
+ * @param {string[]} buttons Full array with the names of each button, will be paginated and stored on btns (see: buildQtdButtons on helper.js)
+ * @param {integer} page_size The size of the page
+ * @param {integer} page_number The number of the page, needed for the button payload
+ */
+async function buildQtdButtons(buttons, pageSize, pageNumber) {
+	const btns = await paginate(buttons, pageSize, pageNumber);
 	const res = [];
-	for (let i = 0; i < buttons.length; i++) {
-		const e = buttons[i]
-		res.push({
-			content_type: 'text',
-			title: e,
-			payload: `productQtd${i + 1}`,
-		}) 
+	for (let i = 0; i < btns.length; i++) {
+		const e = btns[i]
+			res.push({ content_type: 'text', title: e, payload: `productQtd${i + 1}` }) 
 	}
+
+	// if the first element of buttons is different from res, it's not the first page, adds pagination button 
+	if (res && res[0].title !== buttons[0]) res.unshift({ content_type: 'text', title: 'Anterior', payload: `productPageQtd${pageNumber - 1}` })
+	// if the last element is different, it's not the last page, adds pagination button
+	if (res && res[res.length - 1].title !== buttons[buttons.length - 1]) res.push({ content_type: 'text', title: 'Próximo', payload: `productPageQtd${pageNumber + 1}` })
+	res.splice(res.length - 1, 0, { content_type: 'text', title: 'Desistir', payload: 'productNo' }); // permanent button, gets added before Próximo
 
 	return { quick_replies: res };
 }

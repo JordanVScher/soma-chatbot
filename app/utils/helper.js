@@ -116,10 +116,28 @@ async function buildProductView(product = {}) {
 	return text;
 }
 
+/**
+ * Paginates an array
+ * @param {array} array The array to be paginated
+ * @param {integer} page_size The size of the page
+ * @param {integer} page_number The number of the page
+ * @returns {array} array with the elements of the page
+ */
+function paginate(array, page_size, page_number) {
+	page_number = page_number - 1; // because pages logically start with 1, but technically with 0
+	return array.slice(page_number * page_size, (page_number + 1) * page_size);
+}
+
+/**
+ * Builds an array with the title of every product, with the quantity of the product and the cost for them 
+ * @param {integer} qtd The max number of units the user can get with his points
+ * @param {integer} productCost How much the product costs (price is productCost * qtd)
+ * @returns {string[]} - array with the title of every product.
+ */
 async function buildQtdButtons(qtd, productCost) {
 	const buttons = [];
 	for (let i = 1; i <= qtd; i++) {
-		buttons.push(`${i} - ${productCost * i} pontos`)
+		buttons.push(`${i} - ${productCost * i} pontos`);
 	}
 
 	return buttons;
@@ -137,4 +155,5 @@ module.exports = {
 	buildSubtitle,
 	buildProductView,
 	buildQtdButtons,
+	paginate,
 };
