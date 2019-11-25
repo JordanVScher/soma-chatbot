@@ -16,6 +16,8 @@ module.exports = async (context) => {
 			await context.setState({ lastPBpayload: context.event.postback.payload });
 			if (context.state.lastPBpayload === 'greetings' || !context.state.dialog || context.state.dialog === '') {
 				await context.setState({ dialog: 'greetings' });
+			} else if (context.state.lastPBpayload.slice(0, 10) === 'productBuy') {
+				await dialogs.productBuyHelp(context, context.state.lastPBpayload);
 			} else {
 				await context.setState({ dialog: context.state.lastPBpayload });
 			}
@@ -23,7 +25,13 @@ module.exports = async (context) => {
 				context.event.postback.payload, context.event.postback.title);
 		} else if (context.event.isQuickReply) {
 			await context.setState({ lastQRpayload: context.event.quickReply.payload });
+		if (context.state.lastQRpayload.slice(0, 10) === 'productQtd') {
+				await context.setState({ dialog: 'productQtd', productQtd: context.state.lastQRpayload.replace('productQtd', '') });
+		} else if (context.state.lastQRpayload.slice(0, 10) === 'productBuy') {
+			await dialogs.productBuyHelp(context, context.state.lastQRpayload);
+		} else {
 			await context.setState({ dialog: context.state.lastQRpayload });
+		}
 			await assistenteAPI.logFlowChange(context.session.user.id, context.state.chatbotData.user_id,
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
@@ -33,7 +41,7 @@ module.exports = async (context) => {
 
 		switch (context.state.dialog) {
 		case 'greetings':
-			await context.setState({ userPoints: 30, userKilos: 40, cheapestProduct: 50 });
+			await context.setState({ userPoints: 30, userKilos: 40 });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
@@ -50,6 +58,26 @@ module.exports = async (context) => {
 			break;
 		case 'viewAllProducts':
 			await dialogs.viewAllProducts(context);
+			break;
+		case 'productBuy':
+			await dialogs.productBuy(context);
+			break;
+		case 'productQtd':
+			await dialogs.productQtd(context);
+			break;
+		case 'productNo':
+			const newBtns = JSON.parse(JSON.stringify(flow.productNo));
+				newBtns.menuPostback[1] = context.state.productBtnClicked
+				await context.sendText(flow.productNo.text1, await attach.getQR(newBtns))
+			break;
+		case 'productError':
+			await context.sendText(flow.productNo.productError.replace('<WHATSAPP>', process.env.WHATSAPP_NUMBER));
+			await dialogs.sendMainMenu(context);
+			break;
+		case 'productFinish':
+			await context.sendText('A definir...');
+				await context.setState({ userPoints: context.state.userPointsLeft });
+			await dialogs.sendMainMenu(context);
 			break;
 		case 'compartilhar':
 			// await context.sendText(flow.share.txt1);

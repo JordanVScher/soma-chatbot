@@ -209,6 +209,20 @@ async function sendAllProductsCarrousel(context, productList, userPoints) {
 	});
 }
 
+async function buildQtdButtons(buttons) {
+	const res = [];
+	for (let i = 0; i < buttons.length; i++) {
+		const e = buttons[i]
+		res.push({
+			content_type: 'text',
+			title: e,
+			payload: `productQtd${i + 1}`,
+		}) 
+	}
+
+	return { quick_replies: res };
+}
+
 
 module.exports = {
 	sendShare,
@@ -223,4 +237,5 @@ module.exports = {
 	sendMsgFromAssistente,
 	sendUserProductsCarrousel,
 	sendAllProductsCarrousel,
+	buildQtdButtons
 };

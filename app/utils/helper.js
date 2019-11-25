@@ -106,6 +106,25 @@ async function buildSubtitle(product, userPoints) {
 
 	return res;
 }
+
+async function buildProductView(product = {}) {
+	let text = '';
+	if (product.name) text += `${product.name}\n`;
+	if (product.description) text += `${product.description}\n`;
+	if (product.points) text += `Custo: ${product.points} pontos`;
+	
+	return text;
+}
+
+async function buildQtdButtons(qtd, productCost) {
+	const buttons = [];
+	for (let i = 1; i <= qtd; i++) {
+		buttons.push(`${i} - ${productCost * i} pontos`)
+	}
+
+	return buttons;
+}
+
 module.exports = {
 	Sentry,
 	moment,
@@ -116,4 +135,6 @@ module.exports = {
 	getRandomArray,
 	buildRecipientObj,
 	buildSubtitle,
+	buildProductView,
+	buildQtdButtons,
 };

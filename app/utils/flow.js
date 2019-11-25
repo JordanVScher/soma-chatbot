@@ -34,6 +34,18 @@ module.exports = {
 		menuOptions: ['Entendi', 'Ver Todos'],
 		menuPostback: ['mainMenu', 'viewAllProducts'],
 	},
+	productQtd: {
+		text1: 'Ebaa, quantas unidades de <PRODUTO> você quer?',
+		text2: 'Ok. Então, só para confirmar que entendi o seu pedido, você está pedindo <QTD> unidade(s) de <PRODUTO> e isso consumirá <PRICE> ponto(s) e assim sobrará <POINTS> para você. É isso mesmo?',
+		menuOptions: ['Sim', 'Não'],
+		menuPostback: ['productFinish', 'productNo'],
+	},
+	productNo: {
+		text1: 'Ops, me desculpe. O que houve de errado?',
+		productError: 'Ok. Então vou te passar o número do Whatsapp da nossa equipe e eles vão te ajudar com isso.\nWhatsapp: <WHATSAPP>',
+		menuOptions: ['Erro com meus Pontos', 'Alterar Unidades'],
+		menuPostback: ['productError', 'productBtnClicked'],
+	},
 	issueText: {
 		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',
 			'Sou um robô e meus algoritmos ainda estão aprendendo. Não entendi sua mensagem, mas logo te respondo =)',

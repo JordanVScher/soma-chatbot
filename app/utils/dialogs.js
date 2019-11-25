@@ -3,9 +3,9 @@ const help = require('./helper');
 const attach = require('./attach');
 const product = require('./product');
 
-async function sendMainMenu(context, text) {
+async function sendMainMenu(context, text, time = 1000 * 6) {
 	const textToSend = text || help.getRandomArray(flow.mainMenu.text1);
-	await context.typing(1000 * 6);
+	if (time) await context.typing(time);
 	await context.sendText(textToSend, await attach.getQR(flow.mainMenu));
 }
 
@@ -58,14 +58,12 @@ async function handleReset(context) {
 
 async function viewUserProducts(context) {
 	await attach.sendUserProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	await context.typing(1000 * 3);
-	await sendMainMenu(context);
+	// await sendMainMenu(context, '', 1000 * 3);
 }
 
 async function viewAllProducts(context) {
 	await attach.sendAllProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	await context.typing(1000 * 3);
-	await sendMainMenu(context);
+	// await sendMainMenu(context, '', 1000 * 3);
 }
 
 async function myPoints(context) {
@@ -84,6 +82,35 @@ async function myPoints(context) {
 	}
 }
 
+async function productBuyHelp(context, button) {
+	await context.setState({ dialog: 'productBuy', productId: button.replace('productBuy', ''), });
+	await context.setState({ productBtnClicked: button });
+}
+
+async function productBuy(context) {
+	await context.setState({ desiredProduct: context.state.userProducts.find(x => x.id && (x.id.toString() === context.state.productId.toString())) });
+	// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image); 
+	const textToSend = await help.buildProductView(context.state.desiredProduct)
+	if (textToSend) await context.sendText(textToSend);
+	await context.setState({ desiredProductQtd: Math.floor(context.state.userPoints / context.state.desiredProduct.points)});
+	await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points) });
+	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name), await attach.buildQtdButtons(context.state.qtdButtons));
+}
+
+async function productQtd(context) {
+	await context.setState({ productPrice: context.state.desiredProduct.points * context.state.productQtd });
+	await context.setState({ userPointsLeft: context.state.userPoints - context.state.productPrice });
+
+	await context.sendText(flow.productQtd.text2
+		.replace('<QTD>', context.state.productQtd)
+		.replace('<PRODUTO>', context.state.desiredProduct.name)
+		.replace('<PRICE>', context.state.productPrice)
+		.replace('<POINTS>', context.state.userPointsLeft),
+		await attach.getQR(flow.productQtd));		
+
+
+}
+
 module.exports = {
-	sendMainMenu, checkFullName, checkCPF, checkPhone, checkEmail, handleReset, myPoints, viewUserProducts, viewAllProducts,
+	sendMainMenu, checkFullName, checkCPF, checkPhone, checkEmail, handleReset, myPoints, viewUserProducts, viewAllProducts, productBuy, productQtd, productBuyHelp
 };
