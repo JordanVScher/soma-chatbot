@@ -2,11 +2,12 @@ const flow = require('./flow');
 const help = require('./helper');
 const attach = require('./attach');
 const product = require('./product');
+const checkQR = require('./checkQR');
 
 async function sendMainMenu(context, text, time = 1000 * 6) {
 	const textToSend = text || help.getRandomArray(flow.mainMenu.text1);
-	if (time) await context.typing(time);
-	await context.sendText(textToSend, await attach.getQR(flow.mainMenu));
+	if (process.env.ENV !== 'local' && time) await context.typing(time);
+	await context.sendText(textToSend, await checkQR.buildMainMenu(context));
 }
 
 async function checkFullName(context, stateName, successDialog, invalidDialog, reaskMsg) {

@@ -19,8 +19,8 @@ module.exports = {
 			'Me mande uma mensagem caso tenha alguma dúvida =)',
 			'Posso ajudar com mais alguma coisa? É só me enviar uma mensagem ;)',
 		],
-		menuOptions: ['Meus Pontos'],
-		menuPostback: ['myPoints'],
+		// menuOptions: ['Meus Pontos', 'Pontos por escola'],
+		// menuPostback: ['myPoints', 'schoolPoints'],
 	},
 	myPoints: {
 		noPoints: 'Você ainda não tem nenhum ponto! ):',
@@ -45,6 +45,10 @@ module.exports = {
 		productError: 'Ok. Então vou te passar o número do Whatsapp da nossa equipe e eles vão te ajudar com isso.\nWhatsapp: <WHATSAPP>',
 		menuOptions: ['Erro com meus Pontos', 'Alterar Unidades'],
 		menuPostback: ['productError', 'productBtnClicked'],
+	},
+	schoolPoints: {
+		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
+		text2: 'A escola <NAME> já acumulou o total de <POINTS> pontos, e sua turma contribuiu com o total de <POINTS2> pontos para isso =)',
 	},
 	issueText: {
 		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',

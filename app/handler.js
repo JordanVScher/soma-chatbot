@@ -46,7 +46,8 @@ module.exports = async (context) => {
 		case 'greetings':
 			await context.setState({ userPoints: 100, userKilos: 40 });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
-			await context.sendImage(flow.avatarImage);
+			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
+			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await dialogs.sendMainMenu(context);
 			break;
@@ -88,6 +89,14 @@ module.exports = async (context) => {
 			await context.sendText('A definir...');
 			await context.setState({ userPoints: context.state.userPointsLeft });
 			await dialogs.sendMainMenu(context);
+			break;
+		case 'schoolPoints':
+			await context.sendText(flow.schoolPoints.text1);
+			await context.sendText(flow.schoolPoints.text2
+				.replace('<NAME>', context.state.schoolData.name.trim())
+				.replace('<POINTS>', context.state.schoolData.points)
+				.replace('<POINTS2>', context.state.schoolData.turmaPoints));
+			await dialogs.sendMainMenu(context, false, 3 * 1000);
 			break;
 		case 'compartilhar':
 			// await context.sendText(flow.share.txt1);
