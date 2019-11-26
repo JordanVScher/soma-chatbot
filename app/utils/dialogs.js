@@ -83,18 +83,18 @@ async function myPoints(context) {
 }
 
 async function productBuyHelp(context, button) {
-	await context.setState({ dialog: 'productBuy', productId: button.replace('productBuy', ''), });
+	await context.setState({ dialog: 'productBuy', productId: button.replace('productBuy', '') });
 	await context.setState({ productBtnClicked: button });
 }
 
 async function productBuy(context) {
 	await context.setState({ desiredProduct: context.state.userProducts.find(x => x.id && (x.id.toString() === context.state.productId.toString())) });
-	// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image); 
-	const textToSend = await help.buildProductView(context.state.desiredProduct)
+	// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image);
+	const textToSend = await help.buildProductView(context.state.desiredProduct);
 	if (textToSend) await context.sendText(textToSend);
-	await context.setState({ desiredProductQtd: Math.floor(context.state.userPoints / context.state.desiredProduct.points)});
+	await context.setState({ desiredProductQtd: await help.calculateProductUnits(context.state.desiredProduct.points, context.state.userPoints) });
 	await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points), paginationNumber: 0 });
-	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name), 
+	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
 		await attach.buildQtdButtons(context.state.qtdButtons, 9, 1));
 }
 
@@ -107,11 +107,20 @@ async function productQtd(context) {
 		.replace('<PRODUTO>', context.state.desiredProduct.name)
 		.replace('<PRICE>', context.state.productPrice)
 		.replace('<POINTS>', context.state.userPointsLeft),
-		await attach.getQR(flow.productQtd));		
-
-
+	await attach.getQR(flow.productQtd));
 }
 
 module.exports = {
-	sendMainMenu, checkFullName, checkCPF, checkPhone, checkEmail, handleReset, myPoints, viewUserProducts, viewAllProducts, productBuy, productQtd, productBuyHelp
+	sendMainMenu,
+	checkFullName,
+	checkCPF,
+	checkPhone,
+	checkEmail,
+	handleReset,
+	myPoints,
+	viewUserProducts,
+	viewAllProducts,
+	productBuy,
+	productQtd,
+	productBuyHelp,
 };

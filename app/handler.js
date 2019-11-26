@@ -25,16 +25,16 @@ module.exports = async (context) => {
 				context.event.postback.payload, context.event.postback.title);
 		} else if (context.event.isQuickReply) {
 			await context.setState({ lastQRpayload: context.event.quickReply.payload });
-		if (context.state.lastQRpayload.slice(0, 10) === 'productQtd') {
+			if (context.state.lastQRpayload.slice(0, 10) === 'productQtd') {
 				await context.setState({ dialog: 'productQtd', productQtd: context.state.lastQRpayload.replace('productQtd', '') });
-		} else if (context.state.lastQRpayload.slice(0, 10) === 'productBuy') {
-			await dialogs.productBuyHelp(context, context.state.lastQRpayload);
-		} else if (context.state.lastQRpayload.slice(0, 14) === 'productPageQtd') {
-			await context.setState({ dialog: 'productPageQtd', productPage: context.state.lastQRpayload.replace('productPageQtd', '') })
-			await context.setState({ productPage: parseInt(context.state.productPage, 10)	})
-		} else {
-			await context.setState({ dialog: context.state.lastQRpayload });
-		}
+			} else if (context.state.lastQRpayload.slice(0, 10) === 'productBuy') {
+				await dialogs.productBuyHelp(context, context.state.lastQRpayload);
+			} else if (context.state.lastQRpayload.slice(0, 14) === 'productPageQtd') {
+				await context.setState({ dialog: 'productPageQtd', productPage: context.state.lastQRpayload.replace('productPageQtd', '') });
+				await context.setState({ productPage: parseInt(context.state.productPage, 10)	});
+			} else {
+				await context.setState({ dialog: context.state.lastQRpayload });
+			}
 			await assistenteAPI.logFlowChange(context.session.user.id, context.state.chatbotData.user_id,
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
@@ -73,20 +73,20 @@ module.exports = async (context) => {
 			break;
 		case 'productPageQtd': // pagination
 			await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
-			await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
+				await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
 			break;
-		case 'productNo':
+		case 'productNo': {
 			const newBtns = JSON.parse(JSON.stringify(flow.productNo));
-				newBtns.menuPostback[1] = context.state.productBtnClicked
-				await context.sendText(flow.productNo.text1, await attach.getQR(newBtns))
-			break;
+			newBtns.menuPostback[1] = context.state.productBtnClicked;
+			await context.sendText(flow.productNo.text1, await attach.getQR(newBtns));
+		}	break;
 		case 'productError':
 			await context.sendText(flow.productNo.productError.replace('<WHATSAPP>', process.env.WHATSAPP_NUMBER));
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'productFinish':
 			await context.sendText('A definir...');
-				await context.setState({ userPoints: context.state.userPointsLeft });
+			await context.setState({ userPoints: context.state.userPointsLeft });
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'compartilhar':

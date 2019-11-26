@@ -112,30 +112,47 @@ async function buildProductView(product = {}) {
 	if (product.name) text += `${product.name}\n`;
 	if (product.description) text += `${product.description}\n`;
 	if (product.points) text += `Custo: ${product.points} pontos`;
-	
+
 	return text;
 }
 
 /**
  * Paginates an array
  * @param {array} array The array to be paginated
- * @param {integer} page_size The size of the page
- * @param {integer} page_number The number of the page
+ * @param {integer} pageSize The size of the page
+ * @param {integer} pageNumber The number of the page
  * @returns {array} array with the elements of the page
  */
-function paginate(array, page_size, page_number) {
-	page_number = page_number - 1; // because pages logically start with 1, but technically with 0
-	return array.slice(page_number * page_size, (page_number + 1) * page_size);
+function paginate(array, pageSize, pageNumber) {
+	pageNumber -= 1; // because pages logically start with 1, but technically with 0
+	return array.slice(pageNumber * pageSize, (pageNumber + 1) * pageSize);
 }
 
 /**
- * Builds an array with the title of every product, with the quantity of the product and the cost for them 
+ * calculates how many units of one product the user can get
+ * @param {integer} productCost How much the product costs
+ * @param {integer} userPoins The points the user has
+ * @returns {integer} - how many units the user can get
+ */
+async function calculateProductUnits(productCost, userPoins) {
+	let count = 0;
+	// checks if one more unit fits the budget
+	while (userPoins >= (productCost * (count + 1)) && count < 3) { // count < 3, limits units in 3
+		count += 1;
+	}
+
+	return count;
+}
+
+/**
+ * Builds an array with the title of every product, with the quantity of the product and the cost for them
  * @param {integer} qtd The max number of units the user can get with his points
  * @param {integer} productCost How much the product costs (price is productCost * qtd)
  * @returns {string[]} - array with the title of every product.
  */
 async function buildQtdButtons(qtd, productCost) {
 	const buttons = [];
+
 	for (let i = 1; i <= qtd; i++) {
 		buttons.push(`${i} - ${productCost * i} pontos`);
 	}
@@ -156,4 +173,5 @@ module.exports = {
 	buildProductView,
 	buildQtdButtons,
 	paginate,
+	calculateProductUnits,
 };

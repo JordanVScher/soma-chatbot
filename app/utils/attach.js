@@ -220,16 +220,17 @@ async function buildQtdButtons(buttons, pageSize, pageNumber) {
 	const btns = await paginate(buttons, pageSize, pageNumber);
 	const res = [];
 	for (let i = 0; i < btns.length; i++) {
-		const e = btns[i]
-			res.push({ content_type: 'text', title: e, payload: `productQtd${i + 1}` }) 
+		const e = btns[i];
+		res.push({ content_type: 'text', title: e, payload: `productQtd${i + 1}` });
 	}
 
-	// if the first element of buttons is different from res, it's not the first page, adds pagination button 
-	if (res && res[0].title !== buttons[0]) res.unshift({ content_type: 'text', title: 'Anterior', payload: `productPageQtd${pageNumber - 1}` })
+	// if the first element of buttons is different from res, it's not the first page, adds pagination button
+	// if (res && res[0].title !== buttons[0]) res.unshift({ content_type: 'text', title: 'Anterior', payload: `productPageQtd${pageNumber - 1}` });
 	// if the last element is different, it's not the last page, adds pagination button
-	if (res && res[res.length - 1].title !== buttons[buttons.length - 1]) res.push({ content_type: 'text', title: 'Próximo', payload: `productPageQtd${pageNumber + 1}` })
-	res.splice(res.length - 1, 0, { content_type: 'text', title: 'Desistir', payload: 'productNo' }); // permanent button, gets added before Próximo
+	// if (res && res[res.length - 1].title !== buttons[buttons.length - 1]) res.push({ content_type: 'text', title: 'Próximo', payload: `productPageQtd${pageNumber + 1}` });
+	// res.splice(res.length - 1, 0, { content_type: 'text', title: 'Desistir', payload: 'productNo' }); // permanent button, gets added before Próximo
 
+	res.push({ content_type: 'text', title: 'Desistir', payload: 'productNo' });
 	return { quick_replies: res };
 }
 
@@ -247,5 +248,5 @@ module.exports = {
 	sendMsgFromAssistente,
 	sendUserProductsCarrousel,
 	sendAllProductsCarrousel,
-	buildQtdButtons
+	buildQtdButtons,
 };
