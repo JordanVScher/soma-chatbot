@@ -67,19 +67,32 @@ async function viewAllProducts(context) {
 	// await sendMainMenu(context, '', 1000 * 3);
 }
 
+async function showProducts(context) {
+	const cheapest = await product.getSmallestPoint(context.state.userProducts);
+
+	if (context.state.userPoints >= cheapest) {
+		await context.sendText(flow.showProducts.text1, await attach.getQR(flow.showProducts));
+	} else {
+		await context.sendText(flow.showProducts.noPoints1);
+		await context.sendText(flow.showProducts.noPoints2);
+		await viewAllProducts(context);
+	}
+}
+
 async function myPoints(context) {
 	if (!context.state.userPoints) {
 		await context.sendText(flow.myPoints.noPoints);
 		await sendMainMenu(context);
 	} else {
 		await context.sendText(flow.myPoints.showPoints.replace('<KILOS>', context.state.userKilos).replace('<POINTS>', context.state.userPoints));
-		const cheapest = await product.getSmallestPoint(context.state.userProducts);
+	}
 
-		if (context.state.userPoints >= cheapest) {
-			await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
-		} else {
-			await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
-		}
+	const cheapest = await product.getSmallestPoint(context.state.userProducts);
+
+	if (context.state.userPoints >= cheapest) {
+		await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
+	} else {
+		await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
 	}
 }
 
@@ -124,4 +137,5 @@ module.exports = {
 	productBuy,
 	productQtd,
 	productBuyHelp,
+	showProducts,
 };

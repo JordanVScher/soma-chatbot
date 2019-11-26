@@ -60,7 +60,7 @@ async function checkPosition(context) {
 		await context.setState({ dialog: 'myPoints' });
 		break;
 	case 'Meus Produtos':
-		await context.setState({ dialog: 'viewAllProducts' });
+		await context.setState({ dialog: 'showProducts' });
 		break;
 	case 'Pontos Escola':
 		await context.setState({ dialog: 'schoolPoints' });

@@ -57,6 +57,9 @@ module.exports = async (context) => {
 		case 'myPoints':
 			await dialogs.myPoints(context);
 			break;
+		case 'showProducts':
+			await dialogs.showProducts(context);
+			break;
 		case 'viewUserProducts':
 			await dialogs.viewUserProducts(context);
 			break;

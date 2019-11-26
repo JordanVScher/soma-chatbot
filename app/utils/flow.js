@@ -46,6 +46,13 @@ module.exports = {
 		menuOptions: ['Erro com meus Pontos', 'Alterar Unidades'],
 		menuPostback: ['productError', 'productBtnClicked'],
 	},
+	showProducts: {
+		text1: 'Opa, vi aqui que você já possui pontos para trocar por alguns dos produtos disponíveis, quer que eu te mostre só estes produtos, ou prefere ver todos os produtos disponíveis para planejar suas próximas compras?',
+		noPoints1: 'É pra já...',
+		noPoints2: 'Esses são os produtos que temos disponíveis. Espero que te inspire a reciclar mais plásticos e trocar por pontos conosco =)',
+		menuOptions: ['Todos Produtos', 'Para Trocar =)'],
+		menuPostback: ['viewAllProducts', 'viewUserProducts'],
+	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
 		text2: 'A escola <NAME> já acumulou o total de <POINTS> pontos, e sua turma contribuiu com o total de <POINTS2> pontos para isso =)',
