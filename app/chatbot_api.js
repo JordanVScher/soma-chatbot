@@ -93,8 +93,8 @@ module.exports = {
 		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/intents/available?fb_page_id=${pageId}&security_token=${security_token}`));
 	},
 
-	async getTicketTypes() {
-		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/ticket/type?security_token=${security_token}`));
+	async getTicketTypes(chatbot_id) {
+		return handleRequestAnswer(await request(`${apiUri}/api/chatbot/ticket/type?security_token=${security_token}`).query({ chatbot_id }));
 	},
 
 	async getUserTickets(fb_id) {

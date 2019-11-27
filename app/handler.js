@@ -89,9 +89,7 @@ module.exports = async (context) => {
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'productFinish':
-			await context.sendText('A definir...');
-			await context.setState({ userPoints: context.state.userPointsLeft });
-			await dialogs.sendMainMenu(context);
+			await dialogs.productFinish(context);
 			break;
 		case 'schoolPoints':
 			await context.sendText(flow.schoolPoints.text1);

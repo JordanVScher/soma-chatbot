@@ -53,6 +53,9 @@ module.exports = {
 		menuOptions: ['Todos Produtos', 'Para Trocar =)'],
 		menuPostback: ['viewAllProducts', 'viewUserProducts'],
 	},
+	productFinish: {
+		text1: 'Recebemos o seu pedido com sucesso! Logo, estaremos entrando em contato para te dar maiores informações!',
+	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
 		text2: 'A escola <NAME> já acumulou o total de <POINTS> pontos, e sua turma contribuiu com o total de <POINTS2> pontos para isso =)',

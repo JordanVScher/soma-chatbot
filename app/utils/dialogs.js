@@ -3,6 +3,7 @@ const help = require('./helper');
 const attach = require('./attach');
 const product = require('./product');
 const checkQR = require('./checkQR');
+const assistenteAPI = require('../chatbot_api');
 
 async function sendMainMenu(context, text, time = 1000 * 6) {
 	const textToSend = text || help.getRandomArray(flow.mainMenu.text1);
@@ -124,6 +125,23 @@ async function productQtd(context) {
 	await attach.getQR(flow.productQtd));
 }
 
+async function productFinish(context) {
+	const ticketID = process.env.PRODUCT_TICKETID || '';
+	try {
+		await context.setState({ chatbotTickets: await assistenteAPI.getTicketTypes(context.state.chatbotData.organization_chatbot_id) });
+		const { id } = context.state.chatbotTickets.ticket_types.find(x => x.ticket_type_id && x.ticket_type_id.toString() === ticketID.toString());
+		const res = await assistenteAPI.postNewTicket(context.state.chatbotData.organization_chatbot_id, context.session.user.id, id, await help.buildTicket(context.state));
+		if (!res || !res.id) throw new Error('Error Saving user product ticket');
+	} catch (error) {
+		console.log('ticketID', ticketID); console.log(' context.state.chatbotTickets', context.state.chatbotTickets);
+		await help.sentryError('Error Saving user product ticket', error);
+	}
+
+	await context.sendText(flow.productFinish.text1);
+	await sendMainMenu(context);
+}
+
+
 module.exports = {
 	sendMainMenu,
 	checkFullName,
@@ -138,4 +156,5 @@ module.exports = {
 	productQtd,
 	productBuyHelp,
 	showProducts,
+	productFinish,
 };

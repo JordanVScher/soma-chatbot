@@ -72,6 +72,21 @@ async function handleRequestAnswer(response) {
 	}
 }
 
+async function buildTicket(state) {
+	const result = {};
+	if (state.titularNome) { result.titularNome = state.titularNome; }
+	if (state.titularCPF) { result.cpf = state.titularCPF; }
+	// if (state.titularPhone) { result.telefone = state.titularPhone;	}
+	if (state.titularMail) { result.mail = state.titularMail; }
+
+	if (state.desiredProduct.name) { result.productName = state.desiredProduct.name; }
+	if (state.desiredProduct.id) { result.productID = state.desiredProduct.id; }
+	if (state.productQtd) { result.productQtd = state.productQtd; }
+	if (state.productPrice) { result.totalPoints = state.productPrice; }
+
+	return result;
+}
+
 function getRandomArray(array) {
 	return array[Math.floor((Math.random() * array.length))];
 }
@@ -173,5 +188,6 @@ module.exports = {
 	buildProductView,
 	buildQtdButtons,
 	paginate,
+	buildTicket,
 	calculateProductUnits,
 };
