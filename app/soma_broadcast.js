@@ -16,10 +16,10 @@ async function sendMultipleMessages(users, text, res) {
 		const aux = await broadcast.sendBroadcastAluna(e.id, text);
 		if (aux && aux.message_id) {
 			results.successes += 1;
-			results.details.push({ aluno_name: e.name, message_id: aux.message_id, status: 'success' });
+      results.details.push({ aluno_name: e.name, message_id: aux.message_id, recipient_id: e.id, status: 'success',  }); // eslint-disable-line
 		} else {
 			results.failures += 1;
-			results.details.push({ aluno_name: e.name, status: 'failure' });
+			results.details.push({ aluno_name: e.name, recipient_id: e.id, status: 'failure' });
 		}
 	}
 	res.status(200); res.send(results);
