@@ -3,6 +3,7 @@ require('dotenv').config();
 const { MessengerBot, FileSessionStore, withTyping } = require('bottender');
 const { createServer } = require('bottender/restify');
 const requests = require('../requests');
+const broadcast = require('./soma_broadcast');
 
 const config = require('./bottender.config.js').messenger;
 const { getChatbotData } = require('./chatbot_api');
@@ -38,6 +39,10 @@ server.post('/add-label', async (req, res) => {
 
 server.get('/name-id', async (req, res) => {
 	await requests.getNameFBID(req, res);
+});
+
+server.post('/soma-broadcast', async (req, res) => {
+	await broadcast.handler(res, req.body);
 });
 
 server.listen(process.env.API_PORT, () => {

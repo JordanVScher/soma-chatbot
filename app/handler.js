@@ -44,7 +44,7 @@ module.exports = async (context) => {
 
 		switch (context.state.dialog) {
 		case 'greetings':
-			await context.setState({ userPoints: 100, userKilos: 40 });
+			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
