@@ -91,22 +91,24 @@ async function handler(res, body) {
 	if (!body.token_api) { res.status(400); res.send({ error: 'Param token_api missing' }); }
 	if (body.token_api !== process.env.API_TOKEN) { res.status(400); res.send({ error: 'Invalid token_api' }); }
 	const { text } = body;
+	const { all } = body;
 	const { users } = body;
 
 	if (!text) { res.status(400); res.send({ error: 'Param text missing' }); }
-	if (Array.isArray(users) !== true) { res.status(400); res.send({ error: 'Invalid users format.' }); }
+	if (!all && !users) { res.status(400); res.send({ error: 'Invalid "users" array and invalid "all" boolean.' }); }
 
-	if (!users) {
+	if (all === true) {
 		const usersToSend = await getUsers();
 		await sendMultipleMessages(usersToSend, text, res);
 	}
 
+	if (Array.isArray(users) !== true) { res.status(400); res.send({ error: 'Invalid "users" array format.' }); }
+	if (Array.isArray(users) === true && users.length === 0) { res.status(400); res.send({ error: 'Empty "users" array is invalid.' }); }
 
-	if (users) {
+	if (Array.isArray(users) === true && users.length > 0) {
 		const usersToSend = await findUserByFBIDList(users.map(String));
 		let notFound;
 		if (usersToSend.length !== users.length) { notFound = await users.filter(x => !usersToSend.find(y => y.id === x)); }
-
 		await sendMultipleMessages(usersToSend, text, res, notFound);
 	}
 }
