@@ -45,6 +45,10 @@ server.post('/soma-broadcast', async (req, res) => {
 	await broadcast.handler(res, req.body);
 });
 
+server.get('/soma-broadcast', async (req, res) => {
+	await broadcast.getAllBroadcasts(res);
+});
+
 server.listen(process.env.API_PORT, () => {
 	console.log(`Server is running on ${process.env.API_PORT} port...`);
 	console.log(`App: ${process.env.APP} & Page: ${process.env.PAGE}`);

@@ -33,7 +33,7 @@ async function sendMultipleMessages(users, text, res, notFound, id) {
 	if (notFound) results.users_not_found = notFound.length;
 	if (notFound) results.details_not_found = notFound;
 	if (id) {
-		await usersBroadcast.update({ result: JSON.stringify(results) }, { where: { id } })
+		await usersBroadcast.update({ result: results }, { where: { id } })
 			.then(rowsUpdated => rowsUpdated).catch(err => sentryError('Erro no update do usersBroadcast', err));
 	}
 }
@@ -92,7 +92,7 @@ async function findUserByState(value, key) { // eslint-disable-line
 
 async function addToQueue(body, res) {
 	delete body.token_api;
-	const result = await usersBroadcast.create({ request: JSON.stringify(body) }).then(r => r.dataValues).catch(err => sentryError('Erro no update do usersBroadcast', err));
+	const result = await usersBroadcast.create({ request: body }).then(r => r.dataValues).catch(err => sentryError('Erro no update do usersBroadcast', err));
 	if (result && result.id) {
 		res.status(200); res.send({ id: result.id });
 		return result.id;
@@ -135,5 +135,23 @@ async function handler(res, body) {
 	}
 }
 
+async function getAllBroadcasts(res) {
+	const results = await usersBroadcast.findAll({ where: {}, raw: true }).then(r => r).catch(err => sentryError('Erro no findAll do usersBroadcast', err));
+	if (results && Array.isArray(results)) {
+		const newResults = [];
+		results.forEach((e) => {
+			const aux = { id: e.id, request: e.request, created_at: e.createdAt };
+			if (e.id) {
+				aux.sent = !!e.result;
+				newResults.push(aux);
+			}
+		});
+		if (newResults) {
+			res.status(200); res.send({ broadcast_how_many: newResults.length, broadcasts: newResults });
+		}
+	}
 
-module.exports = { handler };
+	res.status(500); res.send({ error: 'Unexpected Error' });
+}
+
+module.exports = { handler, getAllBroadcasts };

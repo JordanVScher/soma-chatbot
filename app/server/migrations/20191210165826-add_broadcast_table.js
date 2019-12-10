@@ -9,11 +9,11 @@ module.exports = {
 				type: Sequelize.INTEGER,
 			},
 			request: {
-				type: Sequelize.TEXT,
+				type: Sequelize.JSON,
 				allowNull: false,
 			},
 			result: {
-				type: Sequelize.TEXT,
+				type: Sequelize.JSON,
 			},
 			created_at: {
 				allowNull: false,
