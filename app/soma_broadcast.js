@@ -154,4 +154,18 @@ async function getAllBroadcasts(res) {
 	res.status(500); res.send({ error: 'Unexpected Error' });
 }
 
-module.exports = { handler, getAllBroadcasts };
+async function getOneBroadcast(res, id) {
+	if (!id || !parseInt(id, 10)) {
+		res.status(400); res.send({ error: 'Invalid ID' });
+	} else {
+		const results = await usersBroadcast.findOne({ where: { id }, raw: true }).then(r => r).catch(err => sentryError('Erro no findOne do usersBroadcast', err));
+		if (results && results.id) {
+			if (!results.result) { delete results.result; }
+			res.status(200); res.send({ results });
+		} else {
+			res.status(200); res.send({ error: `Broadcast with id "${id}" not found` });
+		}
+	}
+}
+
+module.exports = { handler, getAllBroadcasts, getOneBroadcast };

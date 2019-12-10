@@ -45,6 +45,10 @@ server.post('/soma-broadcast', async (req, res) => {
 	await broadcast.handler(res, req.body);
 });
 
+server.get('/soma-broadcast/:id', async (req, res) => {
+	await broadcast.getOneBroadcast(res, req.params.id);
+});
+
 server.get('/soma-broadcast', async (req, res) => {
 	await broadcast.getAllBroadcasts(res);
 });
