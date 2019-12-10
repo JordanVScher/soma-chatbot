@@ -2,11 +2,13 @@ require('dotenv').config();
 
 const fs = require('fs');
 const broadcast = require('./utils/broadcast');
+const { sentryError } = require('./utils/helper');
+const usersBroadcast = require('./server/models').users_broadcast;
 
 const testFolder = './.sessions/';
 const integerRegex = /^-?[0-9]+$/;
 
-async function sendMultipleMessages(users, text, res, notFound) {
+async function sendMultipleMessages(users, text, res, notFound, id) {
 	const results = {};
 	results.users_found = users.length;
 	results.successes = 0;
@@ -30,7 +32,10 @@ async function sendMultipleMessages(users, text, res, notFound) {
 	}
 	if (notFound) results.users_not_found = notFound.length;
 	if (notFound) results.details_not_found = notFound;
-	res.status(200); res.send(results);
+	if (id) {
+		await usersBroadcast.update({ result: JSON.stringify(results) }, { where: { id } })
+			.then(rowsUpdated => rowsUpdated).catch(err => sentryError('Erro no update do usersBroadcast', err));
+	}
 }
 
 async function sendResponse(result, res) { // eslint-disable-line
@@ -85,6 +90,17 @@ async function findUserByState(value, key) { // eslint-disable-line
 	return res;
 }
 
+async function addToQueue(body, res) {
+	delete body.token_api;
+	const result = await usersBroadcast.create({ request: JSON.stringify(body) }).then(r => r.dataValues).catch(err => sentryError('Erro no update do usersBroadcast', err));
+	if (result && result.id) {
+		res.status(200); res.send({ id: result.id });
+		return result.id;
+	}
+
+	res.status(500); res.send({ error: 'Unexpected Error' });
+	return false;
+}
 
 async function handler(res, body) {
 	if (!body) { res.status(400); res.send({ error: 'Empty body' }); }
@@ -98,18 +114,24 @@ async function handler(res, body) {
 	if (!all && !users) { res.status(400); res.send({ error: 'Invalid "users" array and invalid "all" boolean.' }); }
 
 	if (all === true) {
-		const usersToSend = await getUsers();
-		await sendMultipleMessages(usersToSend, text, res);
+		const id = await addToQueue(body, res);
+		if (id) {
+			const usersToSend = await getUsers();
+			await sendMultipleMessages(usersToSend, text, res, [], id);
+		}
 	}
 
 	if (Array.isArray(users) !== true) { res.status(400); res.send({ error: 'Invalid "users" array format.' }); }
 	if (Array.isArray(users) === true && users.length === 0) { res.status(400); res.send({ error: 'Empty "users" array is invalid.' }); }
 
 	if (Array.isArray(users) === true && users.length > 0) {
-		const usersToSend = await findUserByFBIDList(users.map(String));
-		let notFound;
-		if (usersToSend.length !== users.length) { notFound = await users.filter(x => !usersToSend.find(y => y.id === x)); }
-		await sendMultipleMessages(usersToSend, text, res, notFound);
+		const id = await addToQueue(body, res);
+		if (id) {
+			const usersToSend = await findUserByFBIDList(users.map(String));
+			let notFound;
+			if (usersToSend.length !== users.length) { notFound = await users.filter(x => !usersToSend.find(y => y.id === x)); }
+			await sendMultipleMessages(usersToSend, text, res, notFound, id);
+		}
 	}
 }
 
