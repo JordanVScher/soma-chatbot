@@ -152,9 +152,9 @@ async function getAllBroadcasts(res) {
 		if (newResults) {
 			res.status(200); res.send({ broadcast_how_many: newResults.length, broadcasts: newResults });
 		}
+	} else {
+		res.status(500); res.send({ error: 'Unexpected Error' });
 	}
-
-	res.status(500); res.send({ error: 'Unexpected Error' });
 }
 
 async function getOneBroadcast(res, id) {

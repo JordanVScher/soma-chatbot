@@ -1,8 +1,8 @@
 require('dotenv').config();
 
 const { MessengerBot, FileSessionStore, withTyping } = require('bottender');
-// const restify = require('bottender/restify');
-const restify = require('restify');
+const restify = require('bottender/restify');
+// const restify = require('restify');
 const requests = require('../requests');
 const broadcast = require('./soma_broadcast');
 
@@ -34,7 +34,7 @@ const handler = require('./handler');
 bot.onEvent(handler);
 
 const server = restify.createServer(bot, { verifyToken: config.verifyToken });
-server.use(restify.plugins.bodyParser({	requestBodyOnGet: true }));
+// server.use(restify.plugins.bodyParser({	requestBodyOnGet: true }));
 
 server.post('/add-label', async (req, res) => {
 	await requests.addLabel(req, res);
@@ -68,7 +68,7 @@ server.get('/soma-broadcast', async (req, res) => {
 	}
 });
 
-server.get(`/${process.env.FACEBOOK_SERVER_VERIFY}.html`, restify.plugins.serveStatic({	directory: './html' }));
+// server.get(`/${process.env.FACEBOOK_SERVER_VERIFY}.html`, restify.plugins.serveStatic({	directory: './html' }));
 
 server.listen(process.env.API_PORT, () => {
 	console.log(`Server is running on ${process.env.API_PORT} port...`);
