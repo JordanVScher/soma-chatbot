@@ -103,15 +103,14 @@ async function addToQueue(body, res) {
 }
 
 async function handler(res, body) {
-	if (!body) { res.status(400); res.send({ error: 'Empty body' }); }
-	if (!body.token_api) { res.status(400); res.send({ error: 'Param token_api missing' }); }
-	if (body.token_api !== process.env.API_TOKEN) { res.status(400); res.send({ error: 'Invalid token_api' }); }
+	if (!body) { res.status(400); res.send({ error: 'Empty body' }); return false; }
+
 	const { text } = body;
 	const { all } = body;
 	const { users } = body;
 
-	if (!text) { res.status(400); res.send({ error: 'Param text missing' }); }
-	if (!all && !users) { res.status(400); res.send({ error: 'Invalid "users" array and invalid "all" boolean.' }); }
+	if (!text) { res.status(400); res.send({ error: 'Param text missing' }); return false; }
+	if (!all && !users) { res.status(400); res.send({ error: 'Invalid "users" array and invalid "all" boolean.' }); return false; }
 
 	if (all === true) {
 		const id = await addToQueue(body, res);
@@ -119,10 +118,11 @@ async function handler(res, body) {
 			const usersToSend = await getUsers();
 			await sendMultipleMessages(usersToSend, text, res, [], id);
 		}
+		return false;
 	}
 
-	if (Array.isArray(users) !== true) { res.status(400); res.send({ error: 'Invalid "users" array format.' }); }
-	if (Array.isArray(users) === true && users.length === 0) { res.status(400); res.send({ error: 'Empty "users" array is invalid.' }); }
+	if (Array.isArray(users) !== true) { res.status(400); res.send({ error: 'Invalid "users" array format.' }); return false; }
+	if (Array.isArray(users) === true && users.length === 0) { res.status(400); res.send({ error: 'Empty "users" array is invalid.' }); return false; }
 
 	if (Array.isArray(users) === true && users.length > 0) {
 		const id = await addToQueue(body, res);
@@ -132,7 +132,10 @@ async function handler(res, body) {
 			if (usersToSend.length !== users.length) { notFound = await users.filter(x => !usersToSend.find(y => y.id === x)); }
 			await sendMultipleMessages(usersToSend, text, res, notFound, id);
 		}
+		return false;
 	}
+
+	return false;
 }
 
 async function getAllBroadcasts(res) {
@@ -140,7 +143,7 @@ async function getAllBroadcasts(res) {
 	if (results && Array.isArray(results)) {
 		const newResults = [];
 		results.forEach((e) => {
-			const aux = { id: e.id, request: e.request, created_at: e.createdAt };
+			const aux = { id: e.id, created_at: e.createdAt };
 			if (e.id) {
 				aux.sent = !!e.result;
 				newResults.push(aux);

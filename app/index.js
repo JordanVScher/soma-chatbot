@@ -34,6 +34,7 @@ const handler = require('./handler');
 bot.onEvent(handler);
 
 const server = restify.createServer(bot, { verifyToken: config.verifyToken });
+server.use(restify.plugins.bodyParser({	requestBodyOnGet: true }));
 
 server.post('/add-label', async (req, res) => {
 	await requests.addLabel(req, res);
@@ -44,15 +45,27 @@ server.get('/name-id', async (req, res) => {
 });
 
 server.post('/soma-broadcast', async (req, res) => {
-	await broadcast.handler(res, req.body);
+	if (req.header('Api-Token') === process.env.API_TOKEN) {
+		await broadcast.handler(res, req.body);
+	} else {
+		res.status(400); res.send({ error: 'Invalid Api-Token on Header' });
+	}
 });
 
 server.get('/soma-broadcast/:id', async (req, res) => {
-	await broadcast.getOneBroadcast(res, req.params.id);
+	if (req.header('Api-Token') === process.env.API_TOKEN) {
+		await broadcast.getOneBroadcast(res, req.params.id);
+	} else {
+		res.status(400); res.send({ error: 'Invalid Api-Token on Header' });
+	}
 });
 
 server.get('/soma-broadcast', async (req, res) => {
-	await broadcast.getAllBroadcasts(res);
+	if (req.header('Api-Token') === process.env.API_TOKEN) {
+		await broadcast.getAllBroadcasts(res);
+	} else {
+		res.status(400); res.send({ error: 'Invalid Api-Token on Header' });
+	}
 });
 
 server.get(`/${process.env.FACEBOOK_SERVER_VERIFY}.html`, restify.plugins.serveStatic({	directory: './html' }));
