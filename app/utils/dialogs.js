@@ -131,7 +131,11 @@ async function productFinish(context) {
 		await context.setState({ chatbotTickets: await assistenteAPI.getTicketTypes(context.state.chatbotData.organization_chatbot_id) });
 		const { id } = context.state.chatbotTickets.ticket_types.find(x => x.ticket_type_id && x.ticket_type_id.toString() === ticketID.toString());
 		const res = await assistenteAPI.postNewTicket(context.state.chatbotData.organization_chatbot_id, context.session.user.id, id, await help.buildTicket(context.state));
-		if (!res || !res.id) throw new Error('Error Saving user product ticket');
+		if (!res || !res.id) {
+			throw new Error('Error Saving user product ticket');
+		} else {
+			await context.setState({ userPoints: context.state.userPointsLeft });
+		}
 	} catch (error) {
 		console.log('ticketID', ticketID); console.log(' context.state.chatbotTickets', context.state.chatbotTickets);
 		await help.sentryError('Error Saving user product ticket', error);
