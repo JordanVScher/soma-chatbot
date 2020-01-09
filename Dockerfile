@@ -12,9 +12,9 @@ USER node
 ADD package.json /src/
 WORKDIR /src
 
-RUN npm install bottender dotenv
-RUN npm install
-ADD . /src
+# RUN npm install bottender dotenv
+# RUN npm install
+# ADD . /src
 
 USER root
 
