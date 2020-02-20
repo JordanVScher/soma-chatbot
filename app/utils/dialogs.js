@@ -60,12 +60,14 @@ async function handleReset(context) {
 
 async function viewUserProducts(context) {
 	await attach.sendUserProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	// await sendMainMenu(context, '', 1000 * 3);
+	await context.typing(1000 * 3);
+	await sendMainMenu(context);
 }
 
 async function viewAllProducts(context) {
 	await attach.sendAllProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	// await sendMainMenu(context, '', 1000 * 3);
+	await context.typing(1000 * 3);
+	await sendMainMenu(context);
 }
 
 async function showProducts(context) {
