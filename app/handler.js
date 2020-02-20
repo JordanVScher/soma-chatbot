@@ -119,9 +119,6 @@ module.exports = async (context) => {
 			await assistenteAPI.logNotification(context.session.user.id, context.state.chatbotData.user_id, 4);
 			await context.sendText(flow.notifications.off);
 			break;
-		default:
-			await dialogs.sendMainMenu(context);
-			break;
 		} // end switch case
 	} catch (error) {
 		const date = new Date();
