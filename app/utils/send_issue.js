@@ -20,7 +20,7 @@ async function createIssue(context) {
 	const cleanString = await formatString(context.state.whatWasTyped);
 	if (cleanString && cleanString.length > 0 && !blacklist.includes(cleanString)) {
 		const issueResponse = await chatbotAPI.postIssue(context.state.chatbotData.user_id, context.session.user.id, context.state.whatWasTyped,
-			context.state.resultParameters ? context.state.resultParameters : {}, context.state.chatbotData.issue_active);
+			{}, context.state.chatbotData.issue_active);
 
 		if (issueResponse && issueResponse.id) {
 			await context.sendText(await getRandomArray(issueText.success));
