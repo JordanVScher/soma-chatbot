@@ -9,12 +9,12 @@ describe('buildMainMenu', async () => {
 
 		await expect(res.length === 1).toBeTruthy();
 		await expect(res[0].title === 'Participar').toBeTruthy();
-		await expect(res[0].payload === 'joinAsk').toBeTruthy();
+		await expect(res[0].payload === 'join').toBeTruthy();
 	});
 
 	it('Faz parte - vê botão Meus Pontos', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		context.state.userJoined = true;
+		context.state.apiUser = { id: 1 };
 		let res = await checkQR.buildMainMenu(context);
 		res = res.quick_replies;
 
@@ -25,7 +25,7 @@ describe('buildMainMenu', async () => {
 
 	it('Faz parte e tem dados da escola - vê botão Meus Pontos e Minha Escola', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		context.state.userJoined = true;
+		context.state.apiUser = { id: 1 };
 		context.state.schoolData = { name: 'foobar', points: '10', turmaPoints: '10' };
 		let res = await checkQR.buildMainMenu(context);
 		res = res.quick_replies;

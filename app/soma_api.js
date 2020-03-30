@@ -13,23 +13,23 @@ class SomaAPI {
 	}
 
 	async linkUser(FBID, cpf) {
-		return handleRequestAnswer(await this.request.set(this.opt).post(`${this.URL}/link-user`).query({ fb_id: FBID, cpf }));
+		return handleRequestAnswer(await this.request.post(`${this.URL}/link-user`).set(this.opt).query({ fb_id: FBID, cpf }));
 	}
 
 	async getUser(userID) {
-		return handleRequestAnswer(await this.request.set(this.opt).get(`${this.URL}/users/${userID}`));
+		return handleRequestAnswer(await this.request.get(`${this.URL}/users/${userID}`).set(this.opt));
 	}
 
 	async getUserBalance(userID) {
-		return handleRequestAnswer(await this.request.set(this.opt).get(`${this.URL}/users/${userID}/balance`));
+		return handleRequestAnswer(await this.request.get(`${this.URL}/users/${userID}/balance`).set(this.opt));
 	}
 
 	async getSchoolBalance(schoolID) {
-		return handleRequestAnswer(await this.request.set(this.opt).get(`${this.URL}/school/${schoolID}/balance`));
+		return handleRequestAnswer(await this.request.get(`${this.URL}/school/${schoolID}/balance`).set(this.opt));
 	}
 
 	async getRewards(userID) {
-		return handleRequestAnswer(await this.request.set(this.opt).get(`${this.URL}/rewards/${userID}`));
+		return handleRequestAnswer(await this.request.get(`${this.URL}/rewards/${userID}`).set(this.opt));
 	}
 }
 

@@ -1,5 +1,5 @@
 const assistenteAPI = require('./chatbot_api');
-const somaAPI = require('./soma_api');
+// const somaAPI = require('./soma_api');
 const { createIssue } = require('./utils/send_issue');
 const flow = require('./utils/flow');
 const help = require('./utils/helper');
@@ -40,7 +40,11 @@ module.exports = async (context) => {
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
-			await DF.dialogFlow(context);
+			if (['join', 'joinAsk'].includes(context.state.dialog)) {
+				await dialogs.handleCPF(context);
+			} else {
+				await DF.dialogFlow(context);
+			}
 		}
 
 		switch (context.state.dialog) {
@@ -100,6 +104,13 @@ module.exports = async (context) => {
 				.replace('<POINTS>', context.state.schoolData.points)
 				.replace('<POINTS2>', context.state.schoolData.turmaPoints));
 			await dialogs.sendMainMenu(context, false, 3 * 1000);
+			break;
+		case 'join':
+			await context.sendText(flow.joinAsk.text1);
+			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
+			break;
+		case 'joinAsk':
+			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
 			break;
 		case 'compartilhar':
 			await context.sendText(flow.share.txt1);

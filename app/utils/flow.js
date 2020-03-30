@@ -70,4 +70,13 @@ module.exports = {
 		on: 'Legal! Estarei te interando das novidades! Se quiser parar de receber nossas novidades, clique na opção "Parar Notificações 🛑" no menu abaixo. ⬇️',
 		off: 'Você quem manda. Não estarei mais te enviando nenhuma notificação. Se quiser voltar a receber nossas novidades, clique na opção "Ligar Notificações 👌" no menu abaixo. ⬇️',
 	},
+	joinAsk: {
+		text1: 'Aqui você poderá se vincular com sua conta do projeto SO+MA',
+		text2: 'Entre com seu cpf. Exemplo: 123.123.123-11',
+		invalid: 'CPF inválido. Tente novamente',
+		notFound: 'Não encontrei essa CPF nos meus cadastros.',
+		success: 'Sucesso! Te encontrei, a partir de agora você está vinculado(a).',
+		menuOptions: ['Voltar'],
+		menuPostback: ['mainMenu'],
+	},
 };

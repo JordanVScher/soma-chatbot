@@ -42,7 +42,7 @@ async function formatDialogFlow(text) {
 	return result.trim();
 }
 
-async function handleErrorApi(options, res, err) {
+async function handleErrorApi(options = {}, res, err) {
 	let msg = `Endereço: ${options.host}`;
 	msg += `\nPath: ${options.path}`;
 	msg += `\nQuery: ${JSON.stringify(options.query, null, 2)}`;
@@ -70,6 +70,12 @@ async function handleRequestAnswer(response) {
 		await handleErrorApi(response.options, false, error);
 		return {};
 	}
+}
+
+async function getCPFValid(cpf) {
+	const result = cpf.toString().replace(/[_.,-]/g, '');
+	if (!result || cpf.length < 11 || !/^\d+$/.test(result)) { return false; }
+	return result;
 }
 
 async function buildTicket(state) {
@@ -190,4 +196,5 @@ module.exports = {
 	paginate,
 	buildTicket,
 	calculateProductUnits,
+	getCPFValid,
 };
