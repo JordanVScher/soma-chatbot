@@ -64,6 +64,7 @@ typings/
 
 # eslint config
 .eslintrc.json
+.eslintrc
 
 # file session storage
 .sessions

@@ -19,8 +19,8 @@ module.exports = {
 			'Me mande uma mensagem caso tenha alguma dúvida =)',
 			'Posso ajudar com mais alguma coisa? É só me enviar uma mensagem ;)',
 		],
-		// menuOptions: ['Meus Pontos', 'Pontos por escola'],
-		// menuPostback: ['myPoints', 'schoolPoints'],
+		menuOptions: ['Meus Pontos', 'Pontos por escola'],
+		menuPostback: ['myPoints', 'schoolPoints'],
 	},
 	myPoints: {
 		noPoints: 'Você ainda não tem nenhum ponto! ):',

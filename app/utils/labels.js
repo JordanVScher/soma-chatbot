@@ -67,7 +67,7 @@ async function getLabelID(labelName, pageToken, create = true) {
 		if (theOneLabel && theOneLabel.id) { return theOneLabel.id; }
 		if (create) {
 			const newLabel = await createNewLabel(labelName, pageToken);
-			if (newLabel) { return newLabel.id;	}
+			if (newLabel) { return newLabel.id; }
 		}
 		return undefined;
 	} catch (error) {

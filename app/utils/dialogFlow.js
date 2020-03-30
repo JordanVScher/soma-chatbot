@@ -56,15 +56,15 @@ async function checkPosition(context) {
 	case 'Greetings': // add specific intents here
 		await context.setState({ dialog: 'greetings' });
 		break;
-	// case 'Meus Pontos':
-	// 	await context.setState({ dialog: 'myPoints' });
-	// 	break;
-	// case 'Meus Produtos':
-	// 	await context.setState({ dialog: 'showProducts' });
-	// 	break;
-	// case 'Pontos Escola':
-	// 	await context.setState({ dialog: 'schoolPoints' });
-	// 	break;
+	case 'Meus Pontos':
+		await context.setState({ dialog: 'myPoints' });
+		break;
+	case 'Meus Produtos':
+		await context.setState({ dialog: 'showProducts' });
+		break;
+	case 'Pontos Escola':
+		await context.setState({ dialog: 'schoolPoints' });
+		break;
 	case 'Fallback': // didn't understand what was typed
 		await createIssue(context);
 		break;

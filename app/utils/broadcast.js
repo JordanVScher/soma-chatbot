@@ -37,8 +37,8 @@ async function sendCardAluna(USER_ID, cards, cpf) {
 				default_action: {
 					type: 'web_url',
 					url: element.url.replace('CPFRESPOSTA', cpf),
-				// messenger_extensions: 'false',
-				// webview_height_ratio: 'full',
+					// messenger_extensions: 'false',
+					// webview_height_ratio: 'full',
 				},
 				buttons: [
 					{ type: 'web_url', url: element.url.replace('CPFRESPOSTA', cpf), title: 'Fazer Atividade' }],

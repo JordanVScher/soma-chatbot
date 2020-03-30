@@ -4,7 +4,7 @@ const accents = require('remove-accents');
 // const validarCpf = require('validar-cpf');
 
 // Sentry - error reporting
-Sentry.init({	dsn: process.env.SENTRY_DSN, environment: process.env.ENV, captureUnhandledRejections: false });
+Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.ENV, captureUnhandledRejections: false });
 moment.locale('pt-BR');
 
 function sentryError(msg, err) {
@@ -76,7 +76,7 @@ async function buildTicket(state) {
 	const result = {};
 	if (state.titularNome) { result.titularNome = state.titularNome; }
 	if (state.titularCPF) { result.cpf = state.titularCPF; }
-	// if (state.titularPhone) { result.telefone = state.titularPhone;	}
+	// if (state.titularPhone) { result.telefone = state.titularPhone; }
 	if (state.titularMail) { result.mail = state.titularMail; }
 
 	if (state.desiredProduct.name) { result.productName = state.desiredProduct.name; }
