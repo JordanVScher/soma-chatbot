@@ -66,13 +66,13 @@ module.exports = async (context) => {
 			await dialogs.myPoints(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'showProducts':
-			await dialogs.showProducts(context);
+			await dialogs.showProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'viewUserProducts':
-			await dialogs.viewUserProducts(context);
+			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'viewAllProducts':
-			await dialogs.viewAllProducts(context);
+			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'productBuy':
 			// await context.setState({ userPoints: 100, userKilos: 40 });

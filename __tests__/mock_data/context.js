@@ -39,6 +39,7 @@ function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 		sendAudio: jest.fn(),
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
+		typing: jest.fn(),
 	};
 }
 
@@ -83,6 +84,7 @@ function postbackContext(payload, title, dialog = 'prompt', lastActivity = new D
 		sendAudio: jest.fn(),
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
+		typing: jest.fn(),
 	};
 }
 
@@ -130,6 +132,7 @@ function textContext(text, dialog, lastActivity = new Date()) {
 		sendAudio: jest.fn(),
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
+		typing: jest.fn(),
 	};
 }
 

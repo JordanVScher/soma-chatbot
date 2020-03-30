@@ -11,8 +11,29 @@ jest.mock('../app/utils/checkQR');
 jest.mock('../app/utils/mainMenu');
 jest.mock('../app/utils/attach');
 
+const baseBalance = {
+	balance: 100,
+	user_plastic: 10,
+};
 
-describe('linkUserAPI', async () => {
+const baseRewards = [
+	{
+		id: '1',
+		name: 'Caneta Azul',
+		description: 'Uma caneta azul comum',
+		score: 10,
+		img: 'www.foobar.com',
+	},
+	{
+		id: '2',
+		name: 'Estojo',
+		description: 'Um estojo',
+		score: 12,
+		img: 'www.foobar.com',
+	},
+];
+
+describe('linkUserAPI', () => {
 	it('CPF não encontrado - mostra mensagem e pede de novo', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
 		await dialogs.linkUserAPI(context, { error: 'not_found' });
@@ -30,7 +51,7 @@ describe('linkUserAPI', async () => {
 	});
 });
 
-describe('handleCPF', async () => {
+describe('handleCPF', () => {
 	it('CPF inválido - mostra mensagem e pede de novo', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
 		context.state.whatWasTyped = 'foobar';
@@ -50,7 +71,7 @@ describe('handleCPF', async () => {
 	});
 });
 
-describe('schoolPoints', async () => {
+describe('schoolPoints', () => {
 	it('Fracasso ao recarregar os dados - manda mensagem de erro e vai pro menu', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
 		const schoolData = null;
@@ -75,29 +96,7 @@ describe('schoolPoints', async () => {
 	});
 });
 
-const baseBalance = {
-	balance: 100,
-	user_plastic: 10,
-};
-
-const baseRewards = [
-	{
-		id: '1',
-		name: 'Caneta Azul',
-		description: 'Uma caneta azul comum',
-		score: 10,
-		img: 'www.foobar.com',
-	},
-	{
-		id: '2',
-		name: 'Estojo',
-		description: 'Um estojo',
-		score: 12,
-		img: 'www.foobar.com',
-	},
-];
-
-describe('myPoints', async () => {
+describe('checkData', () => {
 	it('Falha ao carregar userBalance - manda msg de erro e volta pro menu', async () => {
 		const context = cont.quickReplyContext('foobar');
 		const userBalance = null;
@@ -119,7 +118,9 @@ describe('myPoints', async () => {
 		await expect(context.sendText).toBeCalledWith(flow.myPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context);
 	});
+});
 
+describe('myPoints', () => {
 	it('Usuário não tem nenhum ponto - Vê msg e vai pro menu', async () => {
 		const context = cont.quickReplyContext('foobar');
 		const userBalance = { ...baseBalance };
@@ -166,5 +167,65 @@ describe('myPoints', async () => {
 
 		const cheapest = await product.getSmallestPoint(rewards);
 		await expect(context.sendText).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
+	});
+});
+
+describe('showProducts', () => {
+	it('Usuário pode comprar algo - Vê msg que oferece troca', async () => {
+		const context = cont.quickReplyContext('foobar');
+		const userBalance = { ...baseBalance };
+		const rewards = [...baseRewards];
+		userBalance.balance = 20;
+		context.state.userBalance = userBalance;
+
+		await dialogs.showProducts(context, userBalance, rewards);
+
+		await expect(context.setState).toBeCalledWith({ userBalance });
+
+		await expect(context.sendText).toBeCalledWith(flow.showProducts.text1, await attach.getQR(flow.showProducts));
+	});
+
+	it('Usuário não pode comprar nada - Vê duas msgs e todos os produtos', async () => {
+		const context = cont.quickReplyContext('foobar');
+		const userBalance = { ...baseBalance };
+		const rewards = [...baseRewards];
+		userBalance.balance = 1;
+		context.state.userBalance = userBalance;
+
+		await dialogs.showProducts(context, userBalance, rewards);
+
+		await expect(context.setState).toBeCalledWith({ userBalance });
+
+		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints1);
+		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints2);
+		// viewAllProducts
+		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, context.state.userBalance.balance);
+		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
+	});
+});
+
+describe('viewAllProducts', () => {
+	it('Sucesso - manda o carrousel com todos os produtos e o menu', async () => {
+		const context = cont.quickReplyContext('foobar');
+		const userBalance = { ...baseBalance };
+		const rewards = [...baseRewards];
+
+		await dialogs.viewAllProducts(context, userBalance, rewards);
+
+		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, userBalance.balance);
+		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
+	});
+});
+
+describe('viewUserProducts', () => {
+	it('Sucesso - manda o carrousel com os produtos do e o menu', async () => {
+		const context = cont.quickReplyContext('foobar');
+		const userBalance = { ...baseBalance };
+		const rewards = [...baseRewards];
+
+		await dialogs.viewUserProducts(context, userBalance, rewards);
+
+		await expect(attach.sendUserProductsCarrousel).toBeCalledWith(context, rewards, userBalance.balance);
+		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
 	});
 });

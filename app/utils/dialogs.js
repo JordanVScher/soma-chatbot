@@ -77,35 +77,49 @@ async function handleReset(context) {
 	await context.setState({ dialog: 'greetings', quizEnded: false, sendShare: false });
 }
 
-async function viewUserProducts(context) {
-	await attach.sendUserProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	await context.typing(1000 * 3);
-	await sendMainMenu(context);
+async function checkData(context, userBalance, rewards) {
+	if (!userBalance || userBalance.error || !rewards || rewards.error) {
+		await context.sendText(flow.myPoints.failure);
+		await sendMainMenu(context);
+
+		return false;
+	}
+
+	return true;
 }
 
-async function viewAllProducts(context) {
-	await attach.sendAllProductsCarrousel(context, context.state.userProducts, context.state.userPoints);
-	await context.typing(1000 * 3);
-	await sendMainMenu(context);
+async function viewUserProducts(context, userBalance, rewards) {
+	if (await checkData(context, userBalance, rewards) === true) {
+		await attach.sendUserProductsCarrousel(context, rewards, userBalance.balance);
+		await sendMainMenu(context, null, 1000 * 3);
+	}
 }
 
-async function showProducts(context) {
-	const cheapest = await product.getSmallestPoint(context.state.userProducts);
+async function viewAllProducts(context, userBalance, rewards) {
+	if (await checkData(context, userBalance, rewards) === true) {
+		await attach.sendAllProductsCarrousel(context, rewards, userBalance.balance);
+		await sendMainMenu(context, null, 1000 * 3);
+	}
+}
 
-	if (context.state.userBalance.balance >= cheapest) {
-		await context.sendText(flow.showProducts.text1, await attach.getQR(flow.showProducts));
-	} else {
-		await context.sendText(flow.showProducts.noPoints1);
-		await context.sendText(flow.showProducts.noPoints2);
-		await viewAllProducts(context);
+async function showProducts(context, userBalance, rewards) {
+	if (await checkData(context, userBalance, rewards) === true) {
+		await context.setState({ userBalance });
+
+		const cheapest = await product.getSmallestPoint(rewards);
+
+		if (context.state.userBalance.balance >= cheapest) {
+			await context.sendText(flow.showProducts.text1, await attach.getQR(flow.showProducts));
+		} else {
+			await context.sendText(flow.showProducts.noPoints1);
+			await context.sendText(flow.showProducts.noPoints2);
+			await viewAllProducts(context, userBalance, rewards);
+		}
 	}
 }
 
 async function myPoints(context, userBalance, rewards) {
-	if (!userBalance || userBalance.error || !rewards || rewards.error) {
-		await context.sendText(flow.myPoints.failure);
-		await sendMainMenu(context);
-	} else {
+	if (await checkData(context, userBalance, rewards) === true) {
 		await context.setState({ userBalance });
 
 		if (!context.state.userBalance.balance) {
