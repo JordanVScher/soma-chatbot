@@ -1,5 +1,5 @@
 const assistenteAPI = require('./chatbot_api');
-// const somaAPI = require('./soma_api');
+const somaAPI = require('./soma_api');
 const { createIssue } = require('./utils/send_issue');
 const flow = require('./utils/flow');
 const help = require('./utils/helper');
@@ -52,9 +52,10 @@ module.exports = async (context) => {
 			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
+			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
+			await context.setState({ apiUser: { id: 'foobar' } });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
-			// await context.sendText(flow.greetings.text1);
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'mainMenu':
@@ -98,12 +99,7 @@ module.exports = async (context) => {
 			await dialogs.productFinish(context);
 			break;
 		case 'schoolPoints':
-			await context.sendText(flow.schoolPoints.text1);
-			await context.sendText(flow.schoolPoints.text2
-				.replace('<NAME>', context.state.schoolData.name.trim())
-				.replace('<POINTS>', context.state.schoolData.points)
-				.replace('<POINTS2>', context.state.schoolData.turmaPoints));
-			await dialogs.sendMainMenu(context, false, 3 * 1000);
+			await dialogs.schoolPoints(context, await somaAPI.getSchoolBalance(context.state.apiUser.id));
 			break;
 		case 'join':
 			await context.sendText(flow.joinAsk.text1);

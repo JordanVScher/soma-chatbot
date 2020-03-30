@@ -3,13 +3,21 @@ const flow = require('./flow');
 const help = require('./helper');
 const attach = require('./attach');
 const product = require('./product');
-const checkQR = require('./checkQR');
 const assistenteAPI = require('../chatbot_api');
+const { sendMainMenu } = require('./mainMenu');
 
-async function sendMainMenu(context, text, time = 1000 * 6) {
-	const textToSend = text || help.getRandomArray(flow.mainMenu.text1);
-	if (process.env.ENV !== 'local' && time) await context.typing(time);
-	await context.sendText(textToSend, await checkQR.buildMainMenu(context));
+async function schoolPoints(context, schoolData) {
+	await context.setState({ schoolData });
+
+	if (schoolData && (schoolData.school_balance !== undefined && schoolData.school_balance !== null)) {
+		await context.sendText(flow.schoolPoints.text1);
+		const msg = await help.buildSchoolMsg(schoolData.school_balance, schoolData.classroom_balance);
+		if (msg && typeof msg === 'string' && msg.length > 0) await context.sendText(msg);
+	} else {
+		await context.sendText(flow.schoolPoints.failure);
+	}
+
+	await sendMainMenu(context, false, 3 * 1000);
 }
 
 async function checkFullName(context, stateName, successDialog, invalidDialog, reaskMsg) {
@@ -175,4 +183,5 @@ module.exports = {
 	productFinish,
 	linkUserAPI,
 	handleCPF,
+	schoolPoints,
 };
