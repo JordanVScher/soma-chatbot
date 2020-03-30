@@ -63,7 +63,7 @@ module.exports = async (context) => {
 			await sendMainMenu(context);
 			break;
 		case 'myPoints':
-			await dialogs.myPoints(context);
+			await dialogs.myPoints(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'showProducts':
 			await dialogs.showProducts(context);

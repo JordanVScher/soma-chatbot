@@ -92,7 +92,7 @@ async function viewAllProducts(context) {
 async function showProducts(context) {
 	const cheapest = await product.getSmallestPoint(context.state.userProducts);
 
-	if (context.state.userPoints >= cheapest) {
+	if (context.state.userBalance.balance >= cheapest) {
 		await context.sendText(flow.showProducts.text1, await attach.getQR(flow.showProducts));
 	} else {
 		await context.sendText(flow.showProducts.noPoints1);
@@ -101,20 +101,29 @@ async function showProducts(context) {
 	}
 }
 
-async function myPoints(context) {
-	if (!context.state.userPoints) {
-		await context.sendText(flow.myPoints.noPoints);
+async function myPoints(context, userBalance, rewards) {
+	if (!userBalance || userBalance.error || !rewards || rewards.error) {
+		await context.sendText(flow.myPoints.failure);
 		await sendMainMenu(context);
 	} else {
-		await context.sendText(flow.myPoints.showPoints.replace('<KILOS>', context.state.userKilos).replace('<POINTS>', context.state.userPoints));
-	}
+		await context.setState({ userBalance });
 
-	const cheapest = await product.getSmallestPoint(context.state.userProducts);
+		if (!context.state.userBalance.balance) {
+			await context.sendText(flow.myPoints.noPoints);
+			await sendMainMenu(context);
+		} else {
+			await context.sendText(flow.myPoints.showPoints
+				.replace('<KILOS>', context.state.userBalance.user_plastic)
+				.replace('<POINTS>', context.state.userBalance.balance));
+		}
 
-	if (context.state.userPoints >= cheapest) {
-		await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
-	} else {
-		await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
+		const cheapest = await product.getSmallestPoint(rewards);
+
+		if (context.state.userBalance.balance >= cheapest) {
+			await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
+		} else {
+			await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
+		}
 	}
 }
 

@@ -27,6 +27,7 @@ module.exports = {
 		showPoints: 'Você já nos enviou o total de <KILOS> Kg(s), e com isso acumulou o total de <POINTS> pontos =)',
 		hasEnough: 'Você já pode realizar algumas trocas, deseja ver o que já é possível trocar?',
 		notEnough: 'Vc esta quase chegando, com <POINTS> pontos você já consegue fazer uma troca.',
+		failure: 'Ops, não consegui carregar os seus dados. Tente novamente mais tarde.',
 		menuOptions: ['Sim', 'Agora não', 'Ver Todos'],
 		menuPostback: ['viewUserProducts', 'mainMenu', 'viewAllProducts'],
 	},
