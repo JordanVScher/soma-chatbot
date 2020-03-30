@@ -1,6 +1,7 @@
 const assistenteAPI = require('./chatbot_api');
 const somaAPI = require('./soma_api');
 const { createIssue } = require('./utils/send_issue');
+const { sendMainMenu } = require('./utils/mainMenu');
 const flow = require('./utils/flow');
 const help = require('./utils/helper');
 const dialogs = require('./utils/dialogs');
@@ -56,10 +57,10 @@ module.exports = async (context) => {
 			await context.setState({ apiUser: { id: 'foobar' } });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		case 'mainMenu':
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		case 'myPoints':
 			await dialogs.myPoints(context);
@@ -93,7 +94,7 @@ module.exports = async (context) => {
 		}	break;
 		case 'productError':
 			await context.sendText(flow.productNo.productError.replace('<WHATSAPP>', process.env.WHATSAPP_NUMBER));
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		case 'productFinish':
 			await dialogs.productFinish(context);
@@ -111,11 +112,11 @@ module.exports = async (context) => {
 		case 'compartilhar':
 			await context.sendText(flow.share.txt1);
 			await attach.sendShare(context, flow.share.cardData);
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		case 'createIssueDirect':
 			await createIssue(context);
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		case 'notificationOn':
 			await assistenteAPI.updateBlacklistMA(context.session.user.id, 1);
@@ -128,7 +129,7 @@ module.exports = async (context) => {
 			await context.sendText(flow.notifications.off);
 			break;
 		default:
-			await dialogs.sendMainMenu(context);
+			await sendMainMenu(context);
 			break;
 		} // end switch case
 	} catch (error) {
