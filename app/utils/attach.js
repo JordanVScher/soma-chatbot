@@ -162,7 +162,7 @@ async function buildPagination(totalProducts, pageNumber) {
 	let limit = startAt + pivot;
 
 	if (limit > totalProducts) {
-		startAt += 1;
+		if (startAt > 0) startAt += 1;
 		limit = totalProducts;
 	}
 
@@ -176,7 +176,7 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 			subtitle: 'Ver produtos anteriores',
 			image_url: 'https://i.imgur.com/Woe8E1X.png',
 			buttons: [
-				{ type: 'postback', title: 'Anteriores', payload: `${payload}${pageNumber - 1}` },
+				{ type: 'postback', title: 'Anterior', payload: `${payload}${pageNumber - 1}` },
 			],
 		});
 	}
@@ -307,4 +307,6 @@ module.exports = {
 	sendUserProductsCarrousel,
 	sendAllProductsCarrousel,
 	buildQtdButtons,
+	buildPagination,
+	addPaginationButtons,
 };
