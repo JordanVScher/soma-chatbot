@@ -199,7 +199,7 @@ describe('showProducts', () => {
 		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints1);
 		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints2);
 		// viewAllProducts
-		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, context.state.userBalance.balance);
+		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, context.state.userBalance.balance, 1);
 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
 	});
 });
@@ -209,10 +209,11 @@ describe('viewAllProducts', () => {
 		const context = cont.quickReplyContext('foobar');
 		const userBalance = { ...baseBalance };
 		const rewards = [...baseRewards];
+		const pageNumber = 1;
 
-		await dialogs.viewAllProducts(context, userBalance, rewards);
+		await dialogs.viewAllProducts(context, userBalance, rewards, pageNumber);
 
-		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, userBalance.balance);
+		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, rewards, userBalance.balance, pageNumber);
 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
 	});
 });

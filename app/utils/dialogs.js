@@ -95,9 +95,9 @@ async function viewUserProducts(context, userBalance, rewards) {
 	}
 }
 
-async function viewAllProducts(context, userBalance, rewards) {
+async function viewAllProducts(context, userBalance, rewards, pageNumber) {
 	if (await checkData(context, userBalance, rewards) === true) {
-		await attach.sendAllProductsCarrousel(context, rewards, userBalance.balance);
+		await attach.sendAllProductsCarrousel(context, rewards, userBalance.balance, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
 }
@@ -113,7 +113,7 @@ async function showProducts(context, userBalance, rewards) {
 		} else {
 			await context.sendText(flow.showProducts.noPoints1);
 			await context.sendText(flow.showProducts.noPoints2);
-			await viewAllProducts(context, userBalance, rewards);
+			await viewAllProducts(context, userBalance, rewards, 1);
 		}
 	}
 }
@@ -146,26 +146,28 @@ async function productBuyHelp(context, button) {
 	await context.setState({ productBtnClicked: button });
 }
 
-async function productBuy(context) {
-	await context.setState({ desiredProduct: context.state.userProducts.find(x => x.id && (x.id.toString() === context.state.productId.toString())) });
-	// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image);
-	const textToSend = await help.buildProductView(context.state.desiredProduct);
-	if (textToSend) await context.sendText(textToSend);
-	await context.setState({ desiredProductQtd: await help.calculateProductUnits(context.state.desiredProduct.points, context.state.userPoints) });
-	await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points), paginationNumber: 0 });
-	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
-		await attach.buildQtdButtons(context.state.qtdButtons, 9, 1));
+async function productBuy(context, userBalance, rewards) {
+	if (await checkData(context, userBalance, rewards) === true) {
+		await context.setState({ desiredProduct: rewards.find(x => x.id && (x.id.toString() === context.state.productId.toString())) });
+		// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image);
+		const textToSend = await help.buildProductView(context.state.desiredProduct);
+		if (textToSend) await context.sendText(textToSend);
+		await context.setState({ desiredProductQtd: await help.calculateProductUnits(context.state.desiredProduct.score, context.state.userBalance.balance) });
+		await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points), paginationNumber: 0 });
+		await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
+			await attach.buildQtdButtons(context.state.qtdButtons, 9, 1));
+	}
 }
 
 async function productQtd(context) {
 	await context.setState({ productPrice: context.state.desiredProduct.points * context.state.productQtd });
-	await context.setState({ userPointsLeft: context.state.userPoints - context.state.productPrice });
+	await context.setState({ userPointsLeft: context.state.userBalance.balance - context.state.productPrice });
 
 	await context.sendText(flow.productQtd.text2
 		.replace('<QTD>', context.state.productQtd)
 		.replace('<PRODUTO>', context.state.desiredProduct.name)
 		.replace('<PRICE>', context.state.productPrice)
-		.replace('<POINTS>', context.state.userPointsLeft),
+		.replace('<POINTS>', context.state.userBalance.balanceLeft),
 	await attach.getQR(flow.productQtd));
 }
 
@@ -178,7 +180,7 @@ async function productFinish(context) {
 		if (!res || !res.id) {
 			throw new Error('Error Saving user product ticket');
 		} else {
-			await context.setState({ userPoints: context.state.userPointsLeft });
+			await context.setState({ userPoints: context.state.userBalance.balanceLeft });
 		}
 	} catch (error) {
 		console.log('ticketID', ticketID); console.log(' context.state.chatbotTickets', context.state.chatbotTickets);

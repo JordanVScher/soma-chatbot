@@ -20,6 +20,8 @@ module.exports = async (context) => {
 				await context.setState({ dialog: 'greetings' });
 			} else if (context.state.lastPBpayload.slice(0, 10) === 'productBuy') {
 				await dialogs.productBuyHelp(context, context.state.lastPBpayload);
+			} else if (context.state.lastPBpayload.slice(0, 11) === 'allProducts') {
+				await context.setState({ dialog: 'allProducts', pageNumber: parseInt(context.state.lastPBpayload.replace('allProducts', ''), 10) });
 			} else {
 				await context.setState({ dialog: context.state.lastPBpayload });
 			}
@@ -72,7 +74,10 @@ module.exports = async (context) => {
 			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'viewAllProducts':
-			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
+			await context.setState({ pageNumber: 1 });
+			// fallsthrough
+		case 'allProducts':
+			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id), context.state.pageNumber);
 			break;
 		case 'productBuy':
 			// await context.setState({ userPoints: 100, userKilos: 40 });

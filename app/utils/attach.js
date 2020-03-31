@@ -180,26 +180,72 @@ async function sendUserProductsCarrousel(context, productList, userPoints) {
 		},
 	});
 }
-async function sendAllProductsCarrousel(context, productList, userPoints) {
-	const elements = [];
+async function buildPagination(totalProducts, pageNumber) {
+	const pivot = 7;
+	let startAt = pageNumber === 1 ? 0 : pivot * (pageNumber - 1) + 1;
+	let limit = startAt + pivot;
 
-	for (let i = 0; i < productList.length; i++) {
-		const e = productList[i];
-		const subtitle = await buildSubtitle(e, userPoints);
-		const buttons = [];
-		if (userPoints >= e.points) {
-			buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}`	});
-		} else {
-			buttons.push({ type: 'postback', title: '<BOTAO OBRIGATORIO>', payload: 'viewAllProducts' });
-		}
+	if (limit > totalProducts) {
+		startAt += 1;
+		limit = totalProducts;
+	}
 
-		elements.push({
-			title: e.name,
-			subtitle,
-			image_url: e.image,
-			buttons,
+	return { startAt, limit };
+}
+
+async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
+	if (pageNumber > 1) {
+		elements.unshift({
+			title: 'Anterior',
+			subtitle: 'Ver produtos anteriores',
+			image_url: 'https://i.imgur.com/Woe8E1X.png',
+			buttons: [
+				{ type: 'postback', title: 'Anteriores', payload: `${payload}${pageNumber - 1}` },
+			],
 		});
 	}
+
+	if (hasNext) {
+		elements.push({
+			title: 'Próximo',
+			subtitle: 'Ver próximos produtos',
+			image_url: 'https://imgur.com/YNeLV04.png',
+			buttons: [
+				{ type: 'postback', title: 'Próximo', payload: `${payload}${pageNumber + 1}` },
+			],
+		});
+	}
+
+	return elements;
+}
+
+async function sendAllProductsCarrousel(context, productList, userPoints, pageNumber) {
+	let elements = [];
+	const totalProducts = productList.length;
+
+	const { startAt, limit } = await buildPagination(totalProducts, pageNumber);
+
+	for (let i = startAt; i <= limit; i++) {
+		const e = productList[i];
+		if (e) {
+			const subtitle = await buildSubtitle(e, userPoints);
+			const buttons = [];
+			if (userPoints >= e.points) {
+				buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` });
+			} else {
+				buttons.push({ type: 'postback', title: 'Cancelar', payload: 'mainMenu' });
+			}
+
+			elements.push({
+				title: `${e.name} ${e.id}`,
+				subtitle,
+				image_url: e.image,
+				buttons,
+			});
+		}
+	}
+
+	elements = await addPaginationButtons(elements, pageNumber, limit < totalProducts, 'allProducts');
 
 	await context.sendAttachment({
 		type: 'template',
