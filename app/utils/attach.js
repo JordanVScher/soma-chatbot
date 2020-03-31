@@ -219,7 +219,7 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 	return elements;
 }
 
-async function sendAllProductsCarrousel(context, productList, userPoints, pageNumber) {
+async function sendAllProductsCarrousel(context, userPoints, productList, pageNumber) {
 	let elements = [];
 	const totalProducts = productList.length;
 
@@ -230,7 +230,7 @@ async function sendAllProductsCarrousel(context, productList, userPoints, pageNu
 		if (e) {
 			const subtitle = await buildSubtitle(e, userPoints);
 			const buttons = [];
-			if (userPoints >= e.points) {
+			if (userPoints >= e.score) {
 				buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` });
 			} else {
 				buttons.push({ type: 'postback', title: 'Cancelar', payload: 'mainMenu' });

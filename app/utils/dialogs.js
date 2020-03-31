@@ -97,7 +97,7 @@ async function viewUserProducts(context, userBalance, rewards) {
 
 async function viewAllProducts(context, userBalance, rewards, pageNumber) {
 	if (await checkData(context, userBalance, rewards) === true) {
-		await attach.sendAllProductsCarrousel(context, rewards, userBalance.balance, pageNumber);
+		await attach.sendAllProductsCarrousel(context, userBalance.balance, rewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
 }
