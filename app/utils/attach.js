@@ -156,32 +156,8 @@ async function sendMsgFromAssistente(context, code, defaultMsgs) {
 	}
 }
 
-async function sendUserProductsCarrousel(context, productList, userPoints) {
-	const elements = [];
-
-	for (let i = 0; i < productList.length; i++) {
-		const e = productList[i];
-		if (userPoints >= e.points) {
-			const subtitle = await buildSubtitle(e, userPoints);
-			elements.push({
-				title: e.name,
-				subtitle,
-				image_url: e.image,
-				buttons: [{ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` }],
-			});
-		}
-	}
-
-	await context.sendAttachment({
-		type: 'template',
-		payload: {
-			template_type: 'generic',
-			elements,
-		},
-	});
-}
 async function buildPagination(totalProducts, pageNumber) {
-	const pivot = 7;
+	const pivot = 7; // number of items per page
 	let startAt = pageNumber === 1 ? 0 : pivot * (pageNumber - 1) + 1;
 	let limit = startAt + pivot;
 
@@ -237,7 +213,7 @@ async function sendAllProductsCarrousel(context, userPoints, productList, pageNu
 			}
 
 			elements.push({
-				title: `${e.name} ${e.id}`,
+				title: e.name,
 				subtitle,
 				image_url: e.image,
 				buttons,
@@ -254,6 +230,42 @@ async function sendAllProductsCarrousel(context, userPoints, productList, pageNu
 			elements,
 		},
 	});
+
+	return elements;
+}
+
+async function sendUserProductsCarrousel(context, productList, userPoints, pageNumber) {
+	let elements = [];
+	const totalProducts = productList.length;
+
+	const { startAt, limit } = await buildPagination(totalProducts, pageNumber);
+
+	for (let i = startAt; i < limit; i++) {
+		const e = productList[i];
+		if (userPoints >= e.score) {
+			const subtitle = await buildSubtitle(e, userPoints);
+
+			elements.push({
+				title: e.name,
+				subtitle,
+				image_url: e.image,
+				buttons: [
+					{ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` }],
+			});
+		}
+	}
+
+	elements = await addPaginationButtons(elements, pageNumber, limit < totalProducts, 'userProducts');
+
+	await context.sendAttachment({
+		type: 'template',
+		payload: {
+			template_type: 'generic',
+			elements,
+		},
+	});
+
+	return elements;
 }
 
 /**

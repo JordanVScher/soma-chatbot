@@ -22,6 +22,8 @@ module.exports = async (context) => {
 				await dialogs.productBuyHelp(context, context.state.lastPBpayload);
 			} else if (context.state.lastPBpayload.slice(0, 11) === 'allProducts') {
 				await context.setState({ dialog: 'allProducts', pageNumber: parseInt(context.state.lastPBpayload.replace('allProducts', ''), 10) });
+			} else if (context.state.lastPBpayload.slice(0, 12) === 'userProducts') {
+				await context.setState({ dialog: 'userProducts', pageNumber: parseInt(context.state.lastPBpayload.replace('userProducts', ''), 10) });
 			} else {
 				await context.setState({ dialog: context.state.lastPBpayload });
 			}
@@ -71,7 +73,10 @@ module.exports = async (context) => {
 			await dialogs.showProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
 			break;
 		case 'viewUserProducts':
-			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
+			await context.setState({ pageNumber: 1 });
+			// fallsthrough
+		case 'userProducts':
+			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id), context.state.pageNumber);
 			break;
 		case 'viewAllProducts':
 			await context.setState({ pageNumber: 1 });

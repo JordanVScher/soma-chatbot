@@ -88,9 +88,11 @@ async function checkData(context, userBalance, rewards) {
 	return true;
 }
 
-async function viewUserProducts(context, userBalance, rewards) {
+async function viewUserProducts(context, userBalance, rewards, pageNumber) {
 	if (await checkData(context, userBalance, rewards) === true) {
-		await attach.sendUserProductsCarrousel(context, rewards, userBalance.balance);
+		let userRewards = rewards.filter(x => x.score <= userBalance.balance); // remove items user can't buy
+		userRewards = userRewards.sort((a, b) => a.score - b.score); // order rewards by score
+		await attach.sendUserProductsCarrousel(context, userBalance.balance, userRewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
 }

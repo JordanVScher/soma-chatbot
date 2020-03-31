@@ -113,10 +113,11 @@ async function buildRecipientObj(context) {
 
 async function buildSubtitle(product, userPoints) {
 	let res = '';
+	const productCost = product.score;
 
-	if (product.points) res += `Pontos: ${product.points}\n`;
-	if (userPoints < product.points) {
-		const missingPoints = product.points - userPoints;
+	if (productCost) res += `Pontos: ${productCost}\n`;
+	if (userPoints < productCost) {
+		const missingPoints = productCost - userPoints;
 		if (missingPoints === 1) {
 			res += `Te falta só ${missingPoints} ponto\n`;
 		} else if (missingPoints > 1) {
@@ -124,6 +125,7 @@ async function buildSubtitle(product, userPoints) {
 		}
 	}
 	if (product.description) res += product.description;
+	if (process.env.ENV === 'local') res += `\nID: ${product.id}`;
 
 	return res;
 }
