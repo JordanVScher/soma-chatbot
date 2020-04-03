@@ -1,6 +1,6 @@
 const help = require('../app/utils/helper');
 
-describe('buildSchoolMsg', async () => {
+describe('buildSchoolMsg', () => {
 	it('Sem pontos - retorna undefined', async () => {
 		const schoolBalance = null;
 		const classroomBalance = null;

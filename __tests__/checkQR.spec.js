@@ -1,7 +1,7 @@
 const cont = require('./mock_data/context');
 const checkQR = require('../app/utils/checkQR');
 
-describe('buildMainMenu', async () => {
+describe('buildMainMenu', () => {
 	it('Não faz parte - vê botão Participar', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
 		let res = await checkQR.buildMainMenu(context);
