@@ -43,7 +43,7 @@ module.exports = async function App(context) {
 				await context.setState({ dialog: context.state.lastQRpayload });
 			}
 			await assistenteAPI.logFlowChange(context.session.user.id, context.state.chatbotData.user_id,
-				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
+				context.state.lastQRpayload, context.state.lastQRpayload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
 			if (['join', 'joinAsk'].includes(context.state.dialog)) {
