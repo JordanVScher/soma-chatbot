@@ -87,7 +87,7 @@ async function checkPosition(context) {
 }
 
 async function dialogFlow(context) {
-	console.log(`\n${context.session.user.name} digitou ${context.event.message.text} - DF Status: ${context.state.chatbotData.use_dialogflow}`);
+	console.log(`\n${context.state.sessionUser.name} digitou ${context.event.message.text} - DF Status: ${context.state.chatbotData.use_dialogflow}`);
 	if (context.state.chatbotData.use_dialogflow === 1) { // check if 'politician' is using dialogFlow
 		await context.setState({ apiaiResp: await textRequestDF(await help.formatDialogFlow(context.state.whatWasTyped), context.session.user.id) });
 		await context.setState({ intentName: context.state.apiaiResp[0].queryResult.intent.displayName || '' }); // intent name

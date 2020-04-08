@@ -11,6 +11,13 @@ function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 				user_id: 2000,
 				use_dialogflow: 1,
 			},
+			sessionUser: {
+				name: 'Foo Bar',
+				firstName: 'Foo',
+				lastName: 'Bar',
+				profilePic: 'foobar',
+				id: 1000,
+			},
 		},
 		session: {
 			lastActivity,
@@ -40,6 +47,7 @@ function quickReplyContext(payload, dialog, lastActivity = new Date()) {
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
 		typing: jest.fn(),
+		getUserProfile: jest.fn(),
 	};
 }
 
@@ -55,6 +63,13 @@ function postbackContext(payload, title, dialog = 'prompt', lastActivity = new D
 			chatbotData: {
 				user_id: 2000,
 				use_dialogflow: 1,
+			},
+			sessionUser: {
+				name: 'Foo Bar',
+				firstName: 'Foo',
+				lastName: 'Bar',
+				profilePic: 'foobar',
+				id: 1000,
 			},
 		},
 		session: {
@@ -85,6 +100,7 @@ function postbackContext(payload, title, dialog = 'prompt', lastActivity = new D
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
 		typing: jest.fn(),
+		getUserProfile: jest.fn(),
 	};
 }
 
@@ -100,6 +116,13 @@ function textContext(text, dialog, lastActivity = new Date()) {
 			chatbotData: {
 				user_id: 2000,
 				use_dialogflow: 1,
+			},
+			sessionUser: {
+				name: 'Foo Bar',
+				firstName: 'Foo',
+				lastName: 'Bar',
+				profilePic: 'foobar',
+				id: 1000,
 			},
 			whatWasTyped: text,
 			toSend: text,
@@ -133,6 +156,7 @@ function textContext(text, dialog, lastActivity = new Date()) {
 		typingOn: jest.fn(),
 		typingOff: jest.fn(),
 		typing: jest.fn(),
+		getUserProfile: jest.fn(),
 	};
 }
 

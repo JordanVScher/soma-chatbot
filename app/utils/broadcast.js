@@ -3,7 +3,7 @@ require('dotenv').config();
 const { MessengerClient } = require('messaging-api-messenger');
 const { sentryError } = require('./helper');
 
-const config = require('../bottender.config').messenger;
+const config = require('../../bottender.config').channels.messenger;
 
 const client = MessengerClient.connect({
 	accessToken: config.accessToken,

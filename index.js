@@ -1,16 +1,17 @@
-const assistenteAPI = require('./chatbot_api');
-const somaAPI = require('./soma_api');
-const { createIssue } = require('./utils/send_issue');
-const { sendMainMenu } = require('./utils/mainMenu');
-const flow = require('./utils/flow');
-const help = require('./utils/helper');
-const dialogs = require('./utils/dialogs');
-const attach = require('./utils/attach');
-const DF = require('./utils/dialogFlow');
-const { mockProduct } = require('./utils/product');
+const assistenteAPI = require('./app/chatbot_api');
+const somaAPI = require('./app/soma_api');
+const { createIssue } = require('./app/utils/send_issue');
+const { sendMainMenu } = require('./app/utils/mainMenu');
+const flow = require('./app/utils/flow');
+const help = require('./app/utils/helper');
+const dialogs = require('./app/utils/dialogs');
+const attach = require('./app/utils/attach');
+const DF = require('./app/utils/dialogFlow');
+const { mockProduct } = require('./app/utils/product');
 
-module.exports = async (context) => {
+module.exports = async function App(context) {
 	try {
+		await context.setState({ sessionUser: { ...await context.getUserProfile() } });
 		await context.setState({ chatbotData: await assistenteAPI.getChatbotData(context.event.rawEvent.recipient.id) });
 		await assistenteAPI.postRecipient(context.state.chatbotData.user_id, await help.buildRecipientObj(context));
 
@@ -149,7 +150,7 @@ module.exports = async (context) => {
 		await context.sendText('Ops. Tive um erro interno. Tente novamente.'); // warning user
 
 		await help.Sentry.configureScope(async (scope) => { // sending to sentry
-			scope.setUser({ username: context.session.user.first_name });
+			scope.setUser({ username: context.state.sessionUser.name });
 			scope.setExtra('state', context.state);
 			throw error;
 		});

@@ -99,8 +99,8 @@ function getRandomArray(array) {
 async function buildRecipientObj(context) {
 	const state = {
 		fb_id: context.session.user.id,
-		name: `${context.session.user.first_name} ${context.session.user.last_name}`,
-		picture: context.session.user.profile_pic,
+		name: context.state.sessionUser.name,
+		picture: context.state.sessionUser.profilePic,
 		// origin_dialog: 'greetings',
 		// session: JSON.stringify(context.state),
 	};
