@@ -19,14 +19,15 @@ module.exports = {
 			'Me mande uma mensagem caso tenha alguma dúvida =)',
 			'Posso ajudar com mais alguma coisa? É só me enviar uma mensagem ;)',
 		],
-		// menuOptions: ['Meus Pontos', 'Pontos por escola'],
-		// menuPostback: ['myPoints', 'schoolPoints'],
+		menuOptions: ['Meus Pontos', 'Pontos por escola'],
+		menuPostback: ['myPoints', 'schoolPoints'],
 	},
 	myPoints: {
 		noPoints: 'Você ainda não tem nenhum ponto! ):',
 		showPoints: 'Você já nos enviou o total de <KILOS> Kg(s), e com isso acumulou o total de <POINTS> pontos =)',
 		hasEnough: 'Você já pode realizar algumas trocas, deseja ver o que já é possível trocar?',
 		notEnough: 'Vc esta quase chegando, com <POINTS> pontos você já consegue fazer uma troca.',
+		failure: 'Ops, não consegui carregar os seus dados. Tente novamente mais tarde.',
 		menuOptions: ['Sim', 'Agora não', 'Ver Todos'],
 		menuPostback: ['viewUserProducts', 'mainMenu', 'viewAllProducts'],
 	},
@@ -58,7 +59,7 @@ module.exports = {
 	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
-		text2: 'A escola <NAME> já acumulou o total de <POINTS> pontos, e sua turma contribuiu com o total de <POINTS2> pontos para isso =)',
+		failure: 'Ops, não consegui carregar os dados da sua escola. Tente novamente mais tarde.',
 	},
 	issueText: {
 		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',
@@ -69,5 +70,14 @@ module.exports = {
 	notifications: {
 		on: 'Legal! Estarei te interando das novidades! Se quiser parar de receber nossas novidades, clique na opção "Parar Notificações 🛑" no menu abaixo. ⬇️',
 		off: 'Você quem manda. Não estarei mais te enviando nenhuma notificação. Se quiser voltar a receber nossas novidades, clique na opção "Ligar Notificações 👌" no menu abaixo. ⬇️',
+	},
+	joinAsk: {
+		text1: 'Aqui você poderá se vincular com sua conta do projeto SO+MA',
+		text2: 'Entre com seu cpf. Exemplo: 123.123.123-11',
+		invalid: 'CPF inválido. Tente novamente',
+		notFound: 'Não encontrei essa CPF nos meus cadastros.',
+		success: 'Sucesso! Te encontrei, a partir de agora você está vinculado(a).',
+		menuOptions: ['Voltar'],
+		menuPostback: ['mainMenu'],
 	},
 };
