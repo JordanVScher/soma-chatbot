@@ -13,6 +13,12 @@ function sentryError(msg, err) {
 	return false;
 }
 
+async function getCPFValid(cpf) {
+	const result = cpf.toString().replace(/[_.,-]/g, '');
+	if (!result || cpf.length < 11 || !/^\d+$/.test(result)) { return false; }
+	return result;
+}
+
 // async function addChar(a, b, position) { return a.substring(0, position) + b + a.substring(position); }
 
 // separates string in the first dot on the second half of the string
@@ -182,6 +188,7 @@ async function buildQtdButtons(qtd, productCost) {
 }
 
 module.exports = {
+	getCPFValid,
 	Sentry,
 	moment,
 	separateString,
