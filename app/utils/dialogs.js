@@ -21,14 +21,24 @@ async function checkFullName(context, stateName, successDialog, invalidDialog, r
 	}
 }
 
-async function checkCPF(context, stateName, successDialog, invalidDialog, reaskMsg) {
-	const cpf = await help.getCPFValid(context.state.whatWasTyped);
-
-	if (cpf) {
-		await context.setState({ [stateName]: cpf, dialog: successDialog });
+async function linkUserAPI(context, apiUser) {
+	if (!apiUser || !apiUser.id || apiUser.error) { // check if this cpf exists on the API
+		await context.sendText(flow.joinAsk.notFound);
+		await context.setState({ dialog: 'joinAsk' });
 	} else {
-		if (reaskMsg) await context.sendText(reaskMsg);
-		await context.setState({ dialog: invalidDialog });
+		await context.sendText(flow.joinAsk.success);
+		await context.setState({ dialog: 'mainMenu' });
+		await context.setState({ apiUser });
+	}
+}
+
+async function handleCPF(context) {
+	const cpf = await help.getCPFValid(context.state.whatWasTyped);
+	if (!cpf) {
+		await context.sendText(flow.joinAsk.invalid);
+		await context.setState({ dialog: 'joinAsk' });
+	} else {
+		await linkUserAPI(context, {id: 1});
 	}
 }
 

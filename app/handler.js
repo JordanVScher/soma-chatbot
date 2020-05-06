@@ -39,7 +39,11 @@ module.exports = async (context) => {
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
-			await DF.dialogFlow(context);
+			if (['join', 'joinAsk'].includes(context.state.dialog)) {
+				await dialogs.handleCPF(context);
+			} else {
+				await DF.dialogFlow(context);
+			}
 		}
 
 		switch (context.state.dialog) {
@@ -65,10 +69,17 @@ module.exports = async (context) => {
 		 case 'viewUserProducts':
 		 	await dialogs.viewUserProducts(context);
 		 	break;
-		 case 'viewAllProducts':
-		 	await dialogs.viewAllProducts(context);
-		 	break;
-		 case 'productBuy':
+		case 'viewAllProducts':
+			await dialogs.viewAllProducts(context);
+			break;
+		case 'join':
+			await context.sendText(flow.joinAsk.text1);
+			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
+			break;
+		case 'joinAsk':
+			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
+			break;
+		case 'productBuy':
 		 	// await context.setState({ userPoints: 100, userKilos: 40 });
 		 	// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 		 	// await context.setState({ dialog: 'productBuy', productId: 1 });
