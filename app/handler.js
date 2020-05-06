@@ -45,62 +45,62 @@ module.exports = async (context) => {
 		switch (context.state.dialog) {
 		case 'greetings':
 
-			// await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
-			// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
-			// await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
+			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
+			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
+			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
-				await context.sendText(flow.greetings.text1);
-			// await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
+				// await context.sendText(flow.greetings.text1);
+			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await dialogs.sendMainMenu(context);
 			break;
 		case 'mainMenu':
 			await dialogs.sendMainMenu(context);
 			break;
-		// case 'myPoints':
-		// 	await dialogs.myPoints(context);
-		// 	break;
-		// case 'showProducts':
-		// 	await dialogs.showProducts(context);
-		// 	break;
-		// case 'viewUserProducts':
-		// 	await dialogs.viewUserProducts(context);
-		// 	break;
-		// case 'viewAllProducts':
-		// 	await dialogs.viewAllProducts(context);
-		// 	break;
-		// case 'productBuy':
-		// 	// await context.setState({ userPoints: 100, userKilos: 40 });
-		// 	// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
-		// 	// await context.setState({ dialog: 'productBuy', productId: 1 });
-		// 	await dialogs.productBuy(context);
-		// 	break;
-		// case 'productQtd':
-		// 	await dialogs.productQtd(context);
-		// 	break;
-		// case 'productPageQtd': // pagination
-		// 	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
-		// 		await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
-		// 	break;
-		// case 'productNo': {
-		// 	const newBtns = JSON.parse(JSON.stringify(flow.productNo));
-		// 	newBtns.menuPostback[1] = context.state.productBtnClicked;
-		// 	await context.sendText(flow.productNo.text1, await attach.getQR(newBtns));
-		// }	break;
-		// case 'productError':
-		// 	await context.sendText(flow.productNo.productError.replace('<WHATSAPP>', process.env.WHATSAPP_NUMBER));
-		// 	await dialogs.sendMainMenu(context);
-		// 	break;
-		// case 'productFinish':
-		// 	await dialogs.productFinish(context);
-		// 	break;
-		// case 'schoolPoints':
-		// 	await context.sendText(flow.schoolPoints.text1);
-		// 	await context.sendText(flow.schoolPoints.text2
-		// 		.replace('<NAME>', context.state.schoolData.name.trim())
-		// 		.replace('<POINTS>', context.state.schoolData.points)
-		// 		.replace('<POINTS2>', context.state.schoolData.turmaPoints));
-		// 	await dialogs.sendMainMenu(context, false, 3 * 1000);
-		// 	break;
+		 case 'myPoints':
+		 	await dialogs.myPoints(context);
+		 	break;
+		 case 'showProducts':
+		 	await dialogs.showProducts(context);
+		 	break;
+		 case 'viewUserProducts':
+		 	await dialogs.viewUserProducts(context);
+		 	break;
+		 case 'viewAllProducts':
+		 	await dialogs.viewAllProducts(context);
+		 	break;
+		 case 'productBuy':
+		 	// await context.setState({ userPoints: 100, userKilos: 40 });
+		 	// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
+		 	// await context.setState({ dialog: 'productBuy', productId: 1 });
+		 	await dialogs.productBuy(context);
+		 	break;
+		 case 'productQtd':
+		 	await dialogs.productQtd(context);
+		 	break;
+		 case 'productPageQtd': // pagination
+		 	await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
+		 		await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
+		 	break;
+		 case 'productNo': {
+		 	const newBtns = JSON.parse(JSON.stringify(flow.productNo));
+		 	newBtns.menuPostback[1] = context.state.productBtnClicked;
+		 	await context.sendText(flow.productNo.text1, await attach.getQR(newBtns));
+		 }	break;
+		 case 'productError':
+		 	await context.sendText(flow.productNo.productError.replace('<WHATSAPP>', process.env.WHATSAPP_NUMBER));
+		 	await dialogs.sendMainMenu(context);
+		 	break;
+		 case 'productFinish':
+		 	await dialogs.productFinish(context);
+		 	break;
+		 case 'schoolPoints':
+		 	await context.sendText(flow.schoolPoints.text1);
+		 	await context.sendText(flow.schoolPoints.text2
+		 		.replace('<NAME>', context.state.schoolData.name.trim())
+		 		.replace('<POINTS>', context.state.schoolData.points)
+		 		.replace('<POINTS2>', context.state.schoolData.turmaPoints));
+		 	await dialogs.sendMainMenu(context, false, 3 * 1000);
+		 	break;
 		case 'compartilhar':
 			// await context.sendText(flow.share.txt1);
 			// await attach.sendShare(context, flow.share.cardData);
