@@ -28,7 +28,7 @@ async function linkUserAPI(context, apiUser) {
 	} else {
 		await context.sendText(flow.joinAsk.success);
 		await context.setState({ dialog: 'mainMenu' });
-		await context.setState({ apiUser });
+		await context.setState({ apiUser, loggedIn: true });
 	}
 }
 
