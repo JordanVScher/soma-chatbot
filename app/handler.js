@@ -39,7 +39,9 @@ module.exports = async (context) => {
 				context.event.message.quick_reply.payload, context.event.message.quick_reply.payload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
-			if (['join', 'joinAsk'].includes(context.state.dialog)) {
+			if (context.state.whatWasTyped === process.env.RESET) {
+				await context.setState({ loggedIn: false, dialog: 'greetings' });
+			} else if (['join', 'joinAsk'].includes(context.state.dialog)) {
 				await dialogs.handleCPF(context);
 			} else {
 				await DF.dialogFlow(context);
