@@ -59,7 +59,7 @@ module.exports = {
 	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
-		failure: 'Ops, não consegui carregar os dados da sua escola. Tente novamente mais tarde.',
+		text2: 'A escola <NAME> já acumulou o total de <POINTS> pontos, e sua turma contribuiu com o total de <POINTS2> pontos para isso =)',
 	},
 	issueText: {
 		success: ['Eu sou um robô e estou aprendendo não entendi sua mensagem.',
