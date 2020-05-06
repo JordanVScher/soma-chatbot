@@ -162,7 +162,6 @@ async function productFinish(context) {
 module.exports = {
 	sendMainMenu,
 	checkFullName,
-	checkCPF,
 	checkPhone,
 	checkEmail,
 	handleReset,
@@ -174,4 +173,5 @@ module.exports = {
 	productBuyHelp,
 	showProducts,
 	productFinish,
+	handleCPF,
 };
