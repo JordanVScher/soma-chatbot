@@ -28,7 +28,6 @@ module.exports = {
 	},
 
 	async linkUser(fbId, cpf) {
-		console.log('fbId', fbId);
 		const res = await request.post(`${somaURL}/v1/link-user`).set({
 			'X-Api-Token': somaToken,
 			'X-Fb-Id': fbId,
@@ -64,4 +63,45 @@ module.exports = {
 
 		return getAnswer(res);
 	},
+
+	async getUser(fbId, userId) {
+		const res = await request.get(`${somaURL}/v1/user/${userId}`).set({
+			'X-Api-Token': somaToken,
+			'X-Fb-Id': fbId,
+			userId,
+		});
+
+		return getAnswer(res);
+	},
+
+	async getUserBalance(fbId, userId) {
+		const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
+			'X-Api-Token': somaToken,
+			'X-Fb-Id': fbId,
+			userId,
+		});
+
+		return getAnswer(res);
+	},
+
+	async getSchoolBalance(fbId, userId) {
+		const res = await request.get(`${somaURL}/v1/user/${userId}/school/balance`).set({
+			'X-Api-Token': somaToken,
+			'X-Fb-Id': fbId,
+			userId,
+		});
+
+		return getAnswer(res);
+	},
+
+	async getUserReward(fbId, userId) {
+		const res = await request.get(`${somaURL}/v1/reward/${userId}`).set({
+			'X-Api-Token': somaToken,
+			'X-Fb-Id': fbId,
+			userId,
+		});
+
+		return getAnswer(res);
+	},
+
 };
