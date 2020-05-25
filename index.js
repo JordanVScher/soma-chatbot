@@ -46,8 +46,13 @@ module.exports = async function App(context) {
 				context.state.lastQRpayload, context.state.lastQRpayload);
 		} else if (context.event.isText) {
 			await context.setState({ whatWasTyped: context.event.message.text });
-			if (['join', 'joinAsk'].includes(context.state.dialog)) {
+			if (process.env.ENV !== 'prod' && context.state.whatWasTyped === process.env.UNLINK_KEY) {
+				await somaAPI.unlinkUser(context.session.user.id, context.state.cpf);
+				await context.setState({ dialog: 'greetings', linked: false, somaUser: null });
+			} else if (['join', 'joinAsk'].includes(context.state.dialog)) {
 				await dialogs.handleCPF(context);
+			} else if (['activateSMS', 'activateSMSAsk'].includes(context.state.dialog)) {
+				await dialogs.handleSMS(context);
 			} else {
 				await DF.dialogFlow(context);
 			}
@@ -59,7 +64,6 @@ module.exports = async function App(context) {
 			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
 			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
 			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
-			await context.setState({ apiUser: { id: 'foobar' } });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await sendMainMenu(context);
@@ -68,22 +72,22 @@ module.exports = async function App(context) {
 			await sendMainMenu(context);
 			break;
 		case 'myPoints':
-			await dialogs.myPoints(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
+			await dialogs.myPoints(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id));
 			break;
 		case 'showProducts':
-			await dialogs.showProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id));
+			await dialogs.showProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id));
 			break;
 		case 'viewUserProducts':
 			await context.setState({ pageNumber: 1 });
 			// fallsthrough
 		case 'userProducts':
-			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id), context.state.pageNumber);
+			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id), context.state.pageNumber);
 			break;
 		case 'viewAllProducts':
 			await context.setState({ pageNumber: 1 });
 			// fallsthrough
 		case 'allProducts':
-			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.apiUser.id), await somaAPI.getRewards(context.state.apiUser.id), context.state.pageNumber);
+			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id), context.state.pageNumber);
 			break;
 		case 'productBuy':
 			// await context.setState({ userPoints: 100, userKilos: 40 });
@@ -111,14 +115,20 @@ module.exports = async function App(context) {
 			await dialogs.productFinish(context);
 			break;
 		case 'schoolPoints':
-			await dialogs.schoolPoints(context, await somaAPI.getSchoolBalance(context.state.apiUser.id));
+			await dialogs.schoolPoints(context, await somaAPI.getSchoolBalance(context.state.somaUser.id));
 			break;
 		case 'join':
 			await context.sendText(flow.joinAsk.text1);
-			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
-			break;
+			// fallsthrough
 		case 'joinAsk':
 			await context.sendText(flow.joinAsk.text2, await attach.getQR(flow.joinAsk));
+			break;
+		case 'activateSMS':
+			await context.sendText(flow.SMSToken.intro);
+			await dialogs.sendSMSTokenForDev(context);
+			// fallsthrough
+		case 'activateSMSAsk':
+			await context.sendText(flow.SMSToken.ask, await attach.getQR(flow.joinAsk));
 			break;
 		case 'compartilhar':
 			await context.sendText(flow.share.txt1);

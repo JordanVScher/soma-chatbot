@@ -8,9 +8,7 @@ Sentry.init({ dsn: process.env.SENTRY_DSN, environment: process.env.ENV, capture
 moment.locale('pt-BR');
 
 function sentryError(msg, err) {
-	console.log(msg, err || '');
-	if (process.env.ENV !== 'local') { Sentry.captureMessage(msg); }
-	return false;
+	if (process.env.ENV !== 'local') Sentry.captureMessage({ msg, err });
 }
 
 // async function addChar(a, b, position) { return a.substring(0, position) + b + a.substring(position); }
@@ -57,7 +55,7 @@ async function handleErrorApi(options = {}, res, err) {
 	if (res) msg += `\nResposta: ${JSON.stringify(res, null, 2)}`;
 	if (err) msg += `\nErro: ${err.stack}`;
 
-	console.log('----------------------------------------------', `\n${msg}`, '\n\n');
+	// console.log('----------------------------------------------', `\n${msg}`, '\n\n');
 
 	if ((res && (res.error || res.form_error)) || (!res && err)) {
 		if (process.env.ENV !== 'local') {
@@ -231,4 +229,5 @@ module.exports = {
 	calculateProductUnits,
 	getCPFValid,
 	buildSchoolMsg,
+	handleErrorApi,
 };

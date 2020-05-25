@@ -29,14 +29,28 @@ async function checkFullName(context, stateName, successDialog, invalidDialog, r
 	}
 }
 
-async function linkUserAPI(context, apiUser) {
-	if (!apiUser || !apiUser.id || apiUser.error) { // check if this cpf exists on the API
+async function linkUserAPI(context, cpf, linkResponse) {
+	console.log('linkResponse', linkResponse);
+	const { statusCode } = linkResponse;
+	switch (statusCode) {
+	case 200: // user was found successfully
+		await context.sendText(flow.joinAsk.success);
+		await context.setState({ cpf, linked: true });
+		await context.setState({ dialog: 'activateSMS' });
+		break;
+	case 404: // user cpf was not found
 		await context.sendText(flow.joinAsk.notFound);
 		await context.setState({ dialog: 'joinAsk' });
-	} else {
-		await context.sendText(flow.joinAsk.success);
-		await context.setState({ dialog: 'mainMenu' });
-		await context.setState({ apiUser });
+		break;
+	case 409: // user cpf was found but it's already linked with another facebook user
+		await context.sendText(flow.joinAsk.alreadyLinked);
+		await context.setState({ dialog: 'joinAsk' });
+		break;
+	default:
+		await help.sentryError('Status inválido em /link-user', { user: context.state, statusCode });
+		await context.sendText(flow.joinAsk.notFound);
+		await context.setState({ dialog: 'joinAsk' });
+		break;
 	}
 }
 
@@ -46,7 +60,34 @@ async function handleCPF(context) {
 		await context.sendText(flow.joinAsk.invalid);
 		await context.setState({ dialog: 'joinAsk' });
 	} else {
-		await linkUserAPI(context, await somaAPI.linkUser(context.session.user.id, cpf));
+		await linkUserAPI(context, cpf, await somaAPI.linkUser(context.session.user.id, cpf));
+	}
+}
+
+
+async function handleSMS(context) {
+	const somaUser = await somaAPI.activateToken(context.session.user.id, context.state.cpf, context.state.whatWasTyped);
+
+	if (somaUser && somaUser.id) {
+		await context.sendText(flow.SMSToken.success);
+		await context.setState({ somaUser });
+		await context.setState({ dialog: 'mainMenu' });
+	} else {
+		await context.sendText(flow.SMSToken.error);
+		await context.setState({ dialog: 'activateSMSAsk' });
+	}
+}
+
+async function sendSMSTokenForDev(context) {
+	const { ENV } = process.env;
+	if (ENV === 'local' || ENV === 'homol') {
+		const res = await somaAPI.getToken(context.session.user.id, context.state.cpf);
+		if (res && res.token) {
+			await context.sendText(flow.SMSToken.dev.intro + flow.SMSToken.dev.token + res.token);
+		} else {
+			await context.sendText(flow.SMSToken.dev.intro + flow.SMSToken.dev.error + res);
+			await help.sentryError(`Erro ao buscar token em ${ENV}`, { user: context.state, session: context.session, res });
+		}
 	}
 }
 
@@ -211,4 +252,6 @@ module.exports = {
 	linkUserAPI,
 	handleCPF,
 	schoolPoints,
+	sendSMSTokenForDev,
+	handleSMS,
 };

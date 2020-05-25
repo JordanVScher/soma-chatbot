@@ -76,8 +76,21 @@ module.exports = {
 		text2: 'Entre com seu cpf. Exemplo: 123.123.123-11',
 		invalid: 'CPF inválido. Tente novamente',
 		notFound: 'Não encontrei essa CPF nos meus cadastros.',
+		alreadyLinked: 'Esse CPF já está vinculado com um usuário!',
 		success: 'Sucesso! Te encontrei, a partir de agora você está vinculado(a).',
 		menuOptions: ['Voltar'],
 		menuPostback: ['mainMenu'],
+	},
+	SMSToken: {
+		intro: 'Agora, para confirmar a sua identidade, entre com o token que acabamos de enviar no seu celular!',
+		ask: 'Entre com o seu token.',
+		success: 'Pronto, te encontrei. 😌\nAgora você poderá conversar comigo para trocar seus pontos por prêmios, clique nos botões abaixo para começar. 😊',
+		error: 'Esse token está incorreto. Tente novamente!',
+		dev: {
+			intro: 'Olá, testador em dev. Essa mensagem só vai aparecer no ambiente de dev, ignore a mensagem acima. ',
+			token: 'Abaixo está o token do SMS que você deverá enviar:\n\n',
+			error: 'Abaixo deveria estar o token do SMS pra você enviar mas aconteceu um erro. Avise um desenvolvedor!',
+		},
+
 	},
 };
