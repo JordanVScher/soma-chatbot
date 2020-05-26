@@ -1,6 +1,7 @@
 const { sentryError } = require('./helper');
 const { buildSubtitle } = require('./helper');
 const { paginate } = require('./helper');
+const { orderRewards } = require('./helper');
 
 function capQR(text) {
 	let result = text;
@@ -174,9 +175,9 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 		elements.unshift({
 			title: 'Anterior',
 			subtitle: 'Ver produtos anteriores',
-			image_url: 'https://i.imgur.com/Woe8E1X.png',
+			// image_url: 'https://i.imgur.com/Woe8E1X.png',
 			buttons: [
-				{ type: 'postback', title: 'Anterior', payload: `${payload}${pageNumber - 1}` },
+				{ type: 'postback', title: '⬅️ Anterior', payload: `${payload}${pageNumber - 1}` },
 			],
 		});
 	}
@@ -185,9 +186,9 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 		elements.push({
 			title: 'Próximo',
 			subtitle: 'Ver próximos produtos',
-			image_url: 'https://imgur.com/YNeLV04.png',
+			// image_url: 'https://imgur.com/YNeLV04.png',
 			buttons: [
-				{ type: 'postback', title: 'Próximo', payload: `${payload}${pageNumber + 1}` },
+				{ type: 'postback', title: 'Próximo ➡️', payload: `${payload}${pageNumber + 1}` },
 			],
 		});
 	}
@@ -197,25 +198,26 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 
 async function sendAllProductsCarrousel(context, userPoints, productList, pageNumber) {
 	let elements = [];
-	const totalProducts = productList.length;
+	const products = orderRewards(productList);
+	const totalProducts = products.length;
 
 	const { startAt, limit } = await buildPagination(totalProducts, pageNumber);
 
 	for (let i = startAt; i <= limit; i++) {
-		const e = productList[i];
-		if (e) {
+		const e = products[i];
+		if (e && e.score) {
 			const subtitle = await buildSubtitle(e, userPoints);
 			const buttons = [];
 			if (userPoints >= e.score) {
 				buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` });
 			} else {
-				buttons.push({ type: 'postback', title: 'Cancelar', payload: 'mainMenu' });
+				buttons.push({ type: 'postback', title: 'Voltar', payload: 'myPoints' });
 			}
 
 			elements.push({
 				title: e.name,
 				subtitle,
-				image_url: e.image,
+				image_url: e.imageUrl,
 				buttons,
 			});
 		}
@@ -234,7 +236,7 @@ async function sendAllProductsCarrousel(context, userPoints, productList, pageNu
 	return elements;
 }
 
-async function sendUserProductsCarrousel(context, productList, userPoints, pageNumber) {
+async function sendUserProductsCarrousel(context, userPoints, productList, pageNumber) {
 	let elements = [];
 	const totalProducts = productList.length;
 
@@ -248,7 +250,7 @@ async function sendUserProductsCarrousel(context, productList, userPoints, pageN
 			elements.push({
 				title: e.name,
 				subtitle,
-				image_url: e.image,
+				image_url: e.imageUrl,
 				buttons: [
 					{ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` }],
 			});
@@ -279,7 +281,7 @@ async function buildQtdButtons(buttons, pageSize, pageNumber) {
 	const res = [];
 	for (let i = 0; i < btns.length; i++) {
 		const e = btns[i];
-		res.push({ content_type: 'text', title: e, payload: `productQtd${i + 1}` });
+		res.push({ content_type: 'text', title: e, payload: `rewardQtd${i + 1}` });
 	}
 
 	// if the first element of buttons is different from res, it's not the first page, adds pagination button

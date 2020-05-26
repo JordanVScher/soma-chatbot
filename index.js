@@ -7,7 +7,6 @@ const help = require('./app/utils/helper');
 const dialogs = require('./app/utils/dialogs');
 const attach = require('./app/utils/attach');
 const DF = require('./app/utils/dialogFlow');
-const { mockProduct } = require('./app/utils/product');
 
 module.exports = async function App(context) {
 	try {
@@ -19,11 +18,11 @@ module.exports = async function App(context) {
 			await context.setState({ lastPBpayload: context.event.postback.payload });
 			if (context.state.lastPBpayload === 'greetings' || !context.state.dialog || context.state.dialog === '') {
 				await context.setState({ dialog: 'greetings' });
-			} else if (context.state.lastPBpayload.slice(0, 10) === 'productBuy') {
+			} else if (context.state.lastPBpayload.startsWith('productBuy')) {
 				await dialogs.productBuyHelp(context, context.state.lastPBpayload);
-			} else if (context.state.lastPBpayload.slice(0, 11) === 'allProducts') {
+			} else if (context.state.lastPBpayload.startsWith('allProducts')) {
 				await context.setState({ dialog: 'allProducts', pageNumber: parseInt(context.state.lastPBpayload.replace('allProducts', ''), 10) });
-			} else if (context.state.lastPBpayload.slice(0, 12) === 'userProducts') {
+			} else if (context.state.lastPBpayload.startsWith('userProducts')) {
 				await context.setState({ dialog: 'userProducts', pageNumber: parseInt(context.state.lastPBpayload.replace('userProducts', ''), 10) });
 			} else {
 				await context.setState({ dialog: context.state.lastPBpayload });
@@ -32,11 +31,11 @@ module.exports = async function App(context) {
 				context.event.postback.payload, context.event.postback.title);
 		} else if (context.event.isQuickReply) {
 			await context.setState({ lastQRpayload: context.event.quickReply.payload });
-			if (context.state.lastQRpayload.slice(0, 10) === 'productQtd') {
-				await context.setState({ dialog: 'productQtd', productQtd: context.state.lastQRpayload.replace('productQtd', '') });
-			} else if (context.state.lastQRpayload.slice(0, 10) === 'productBuy') {
+			if (context.state.lastQRpayload.startsWith('rewardQtd')) {
+				await context.setState({ dialog: 'rewardQtd', rewardQtd: context.state.lastQRpayload.replace('rewardQtd', '') });
+			} else if (context.state.lastQRpayload.startsWith('productBuy')) {
 				await dialogs.productBuyHelp(context, context.state.lastQRpayload);
-			} else if (context.state.lastQRpayload.slice(0, 14) === 'productPageQtd') {
+			} else if (context.state.lastQRpayload.startsWith('productPageQtd')) {
 				await context.setState({ dialog: 'productPageQtd', productPage: context.state.lastQRpayload.replace('productPageQtd', '') });
 				await context.setState({ productPage: parseInt(context.state.productPage, 10)	});
 			} else {
@@ -60,10 +59,6 @@ module.exports = async function App(context) {
 
 		switch (context.state.dialog) {
 		case 'greetings':
-			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
-			await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
-			await context.setState({ schoolData: { name: 'Desembargador Eliseu', points: 1000, turmaPoints: 100 } });
-			await context.setState({ userPoints: 100, userKilos: 40, userTurmaID: '40' });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await sendMainMenu(context);
@@ -72,39 +67,36 @@ module.exports = async function App(context) {
 			await sendMainMenu(context);
 			break;
 		case 'myPoints':
-			await dialogs.myPoints(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id));
+			await dialogs.myPoints(context);
 			break;
 		case 'showProducts':
-			await dialogs.showProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id));
+			await dialogs.showProducts(context);
 			break;
 		case 'viewUserProducts':
 			await context.setState({ pageNumber: 1 });
 			// fallsthrough
 		case 'userProducts':
-			await dialogs.viewUserProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id), context.state.pageNumber);
+			await dialogs.viewUserProducts(context, context.state.pageNumber);
 			break;
 		case 'viewAllProducts':
 			await context.setState({ pageNumber: 1 });
 			// fallsthrough
 		case 'allProducts':
-			await dialogs.viewAllProducts(context, await somaAPI.getUserBalance(context.state.somaUser.id), await somaAPI.getRewards(context.state.somaUser.id), context.state.pageNumber);
+			await dialogs.viewAllProducts(context, context.state.pageNumber);
 			break;
 		case 'productBuy':
-			// await context.setState({ userPoints: 100, userKilos: 40 });
-			// await context.setState({ userProducts: mockProduct.sort((a, b) => a.points - b.points) });
-			// await context.setState({ dialog: 'productBuy', productId: 1 });
 			await dialogs.productBuy(context);
 			break;
-		case 'productQtd':
-			await dialogs.productQtd(context);
+		case 'rewardQtd':
+			await dialogs.rewardQtd(context);
 			break;
 		case 'productPageQtd': // pagination
-			await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
+			await context.sendText(flow.rewardQtd.text1.replace('<PRODUTO>', context.state.desiredReward.name),
 				await attach.buildQtdButtons(context.state.qtdButtons, 8, context.state.productPage));
 			break;
 		case 'productNo': {
 			const newBtns = JSON.parse(JSON.stringify(flow.productNo));
-			newBtns.menuPostback[1] = context.state.productBtnClicked;
+			newBtns.menuPostback[0] = context.state.productBtnClicked;
 			await context.sendText(flow.productNo.text1, await attach.getQR(newBtns));
 		}	break;
 		case 'productError':

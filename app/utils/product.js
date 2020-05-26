@@ -21,15 +21,5 @@ const mockProduct = [
 	{ id: 20, name: 'Mochila', score: 70, description: 'Mochila preta', image: 'https://http2.mlstatic.com/mochila-masculina-executiva-alca-cabo-de-aco-reforcada-preta-D_NQ_NP_650373-MLB31119343404_062019-F.jpg' }, // eslint-disable-line object-curly-newline
 ];
 
-/**
- * Returns the score from the product with the smallest number of score. (Expects array to be sorted by score asc)
- * @param {array} productList A list with all the user products
- * @returns {Number} product score
- */
-async function getSmallestPoint(productList) {
-	return productList && productList[0] ? productList[0].score : '';
-	// return productList.reduce((a, b) => (a.score < b.score ? a : b)).id;
-}
 
-
-module.exports = { mockProduct, getSmallestPoint };
+module.exports = { mockProduct };

@@ -75,13 +75,33 @@ module.exports = {
 	},
 
 	async getUserBalance(fbId, userId) {
-		const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
-			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
-			userId,
-		});
+		// const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
+		// 	'X-Api-Token': somaToken,
+		// 	'X-Fb-Id': fbId,
+		// 	userId,
+		// }).send({ userId });
 
-		return getAnswer(res);
+		// return getAnswer(res);
+		return {
+			balance: 10000,
+			residues: [
+				{
+					name: 'BB',
+					amount: 10,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'AA',
+					amount: 15,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'VV',
+					amount: 15,
+					unitType: 'Gram',
+				},
+			],
+		};
 	},
 
 	async getSchoolBalance(fbId, userId) {
@@ -94,7 +114,7 @@ module.exports = {
 		return getAnswer(res);
 	},
 
-	async getUserReward(fbId, userId) {
+	async getUserRewards(fbId, userId) {
 		const res = await request.get(`${somaURL}/v1/reward/${userId}`).set({
 			'X-Api-Token': somaToken,
 			'X-Fb-Id': fbId,

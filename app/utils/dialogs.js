@@ -118,100 +118,134 @@ async function handleReset(context) {
 	await context.setState({ dialog: 'greetings', quizEnded: false, sendShare: false });
 }
 
+// checks if both requests worked as expected
 async function checkData(context, userBalance, rewards) {
-	if (!userBalance || userBalance.error || !rewards || rewards.error) {
+	if (!userBalance || !userBalance.balance || !rewards) {
 		await context.sendText(flow.myPoints.failure);
 		await sendMainMenu(context);
-
 		return false;
 	}
 
+	await context.setState({ userBalance, rewards });
 	return true;
 }
 
-async function viewUserProducts(context, userBalance, rewards, pageNumber) {
+async function viewUserProducts(context, pageNumber) {
+	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
+	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
+
 	if (await checkData(context, userBalance, rewards) === true) {
-		let userRewards = rewards.filter(x => x.score <= userBalance.balance); // remove items user can't buy
-		userRewards = userRewards.sort((a, b) => a.score - b.score); // order rewards by score
+		let userRewards = help.getAffortableRewards(rewards, userBalance.balance);
+		userRewards = help.orderRewards(userRewards);
+
 		await attach.sendUserProductsCarrousel(context, userBalance.balance, userRewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
 }
 
-async function viewAllProducts(context, userBalance, rewards, pageNumber) {
+async function viewAllProducts(context, pageNumber) {
+	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
+	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
 	if (await checkData(context, userBalance, rewards) === true) {
 		await attach.sendAllProductsCarrousel(context, userBalance.balance, rewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
 }
 
-async function showProducts(context, userBalance, rewards) {
+async function showProducts(context) {
+	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
+	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
+
 	if (await checkData(context, userBalance, rewards) === true) {
-		await context.setState({ userBalance });
+		const cheapestScore = help.getSmallestPoint(rewards);
 
-		const cheapest = await product.getSmallestPoint(rewards);
-
-		if (context.state.userBalance.balance >= cheapest) {
+		if (userBalance.balance >= cheapestScore) {
 			await context.sendText(flow.showProducts.text1, await attach.getQR(flow.showProducts));
 		} else {
 			await context.sendText(flow.showProducts.noPoints1);
 			await context.sendText(flow.showProducts.noPoints2);
-			await viewAllProducts(context, userBalance, rewards, 1);
+			await viewAllProducts(context, 1);
 		}
 	}
 }
 
-async function myPoints(context, userBalance, rewards) {
-	if (await checkData(context, userBalance, rewards) === true) {
-		await context.setState({ userBalance });
+async function myPoints(context) {
+	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
+	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
 
-		if (!context.state.userBalance.balance) {
+	if (await checkData(context, userBalance, rewards) === true) {
+		if (!userBalance.balance) { // if user has no points, send him to the menu
 			await context.sendText(flow.myPoints.noPoints);
 			await sendMainMenu(context);
 		} else {
-			await context.sendText(flow.myPoints.showPoints
-				.replace('<KILOS>', context.state.userBalance.user_plastic)
-				.replace('<POINTS>', context.state.userBalance.balance));
-		}
+			const kilos = help.countKilos(userBalance.residues);
 
-		const cheapest = await product.getSmallestPoint(rewards);
+			if (kilos) { // count how many kilos the user has to send the proper message
+				await context.sendText(flow.myPoints.showPoints.replace('<KILOS>', kilos).replace('<POINTS>', userBalance.balance));
+			} else { // in case there was an error with the kilos counting, send a message that has only the points
+				await context.sendText(flow.myPoints.onlyPoints.replace('<POINTS>', userBalance.balance));
+			}
 
-		if (context.state.userBalance.balance >= cheapest) {
-			await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
-		} else {
-			await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
+			// find the cheapest reward
+			const cheapestScore = help.getSmallestPoint(rewards);
+
+			if (userBalance.balance >= cheapestScore) { // can the user get the cheapest reward whith his points?
+				await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
+			} else {
+				await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapestScore), await attach.getQR(flow.notEnough));
+			}
 		}
 	}
 }
 
 async function productBuyHelp(context, button) {
 	await context.setState({ dialog: 'productBuy', productId: button.replace('productBuy', '') });
-	await context.setState({ productBtnClicked: button });
+	await context.setState({ productBtnClicked: button, paginationNumber: 0 });
 }
 
-async function productBuy(context, userBalance, rewards) {
+async function productBuy(context) {
+	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
+	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
+
 	if (await checkData(context, userBalance, rewards) === true) {
-		await context.setState({ desiredProduct: rewards.find(x => x.id && (x.id.toString() === context.state.productId.toString())) });
-		// if (context.state.desiredProduct.image) await context.sendImage(context.state.desiredProduct.image);
-		const textToSend = await help.buildProductView(context.state.desiredProduct);
-		if (textToSend) await context.sendText(textToSend);
-		await context.setState({ desiredProductQtd: await help.calculateProductUnits(context.state.desiredProduct.score, context.state.userBalance.balance) });
-		await context.setState({ qtdButtons: await help.buildQtdButtons(context.state.desiredProductQtd, context.state.desiredProduct.points), paginationNumber: 0 });
-		await context.sendText(flow.productQtd.text1.replace('<PRODUTO>', context.state.desiredProduct.name),
-			await attach.buildQtdButtons(context.state.qtdButtons, 9, 1));
+		// find the product the user clicked
+		const desiredReward = rewards.find(x => x.id && (x.id.toString() === context.state.productId.toString()));
+		await context.setState({ desiredReward });
+
+		if (desiredReward && desiredReward.id && desiredReward.score) {
+			// if (desiredReward.imageUrl) await context.sendImage(desiredReward.imageUrl); // send image if there's one url
+
+			const textToSend = await help.buildProductView(desiredReward); // build details text
+			if (textToSend) await context.sendText(textToSend);
+
+			// calculate and build quantity buttons
+			const desiredRewardQtd = await help.calculateProductUnits(desiredReward.score, userBalance.balance);
+			await context.setState({ desiredRewardQtd });
+
+			if (!desiredRewardQtd) {
+				await context.sendText('Ops, parece que o preço mudou e você não tem mais pontos suficientes para essa recompensa! Tente novamente, por favor.');
+				await viewUserProducts(context);
+			} else {
+				const qtdButtons = await help.buildQtdButtons(desiredRewardQtd, desiredReward.score);
+				await context.setState({ qtdButtons });
+				await context.sendText(flow.rewardQtd.text1.replace('<PRODUTO>', desiredReward.name),	await attach.buildQtdButtons(context.state.qtdButtons, 3, 1));
+			}
+		} else {
+			await context.sendText('Não consegui encontrar essa recompensa, acho que ele não está mais disponível. Que tal escolher outro? Temos muita coisa legal:');
+		}
 	}
 }
 
-async function productQtd(context) {
-	await context.setState({ productPrice: context.state.desiredProduct.points * context.state.productQtd });
-	await context.setState({ userPointsLeft: context.state.userBalance.balance - context.state.productPrice });
+async function rewardQtd(context) {
+	await context.setState({ rewardPrice: context.state.desiredReward.score * context.state.rewardQtd });
+	await context.setState({ userPointsLeft: context.state.userBalance.balance - context.state.rewardPrice });
 
-	await context.sendText(flow.productQtd.text2
-		.replace('<QTD>', context.state.productQtd)
-		.replace('<PRODUTO>', context.state.desiredProduct.name)
-		.replace('<PRICE>', context.state.productPrice)
-		.replace('<POINTS>', context.state.userBalance.balanceLeft),
-	await attach.getQR(flow.productQtd));
+	await context.sendText(flow.rewardQtd.text2
+		.replace('<QTD>', context.state.rewardQtd)
+		.replace('<PRODUTO>', context.state.desiredReward.name)
+		.replace('<PRICE>', context.state.rewardPrice)
+		.replace('<POINTS>', context.state.userPointsLeft),
+	await attach.getQR(flow.rewardQtd));
 }
 
 async function productFinish(context) {
@@ -223,7 +257,7 @@ async function productFinish(context) {
 		if (!res || !res.id) {
 			throw new Error('Error Saving user product ticket');
 		} else {
-			await context.setState({ userPoints: context.state.userBalance.balanceLeft });
+			await context.setState({ userPoints: context.state.userPointsLeft });
 		}
 	} catch (error) {
 		console.log('ticketID', ticketID); console.log(' context.state.chatbotTickets', context.state.chatbotTickets);
@@ -245,7 +279,7 @@ module.exports = {
 	viewUserProducts,
 	viewAllProducts,
 	productBuy,
-	productQtd,
+	rewardQtd,
 	productBuyHelp,
 	showProducts,
 	productFinish,

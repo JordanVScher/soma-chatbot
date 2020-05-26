@@ -89,10 +89,10 @@ async function buildTicket(state) {
 	// if (state.titularPhone) { result.telefone = state.titularPhone; }
 	if (state.titularMail) { result.mail = state.titularMail; }
 
-	if (state.desiredProduct.name) { result.productName = state.desiredProduct.name; }
-	if (state.desiredProduct.id) { result.productID = state.desiredProduct.id; }
-	if (state.productQtd) { result.productQtd = state.productQtd; }
-	if (state.productPrice) { result.totalPoints = state.productPrice; }
+	if (state.desiredReward.name) { result.rewardName = state.desiredReward.name; }
+	if (state.desiredReward.id) { result.rewardID = state.desiredReward.id; }
+	if (state.rewardQtd) { result.rewardQtd = state.rewardQtd; }
+	if (state.rewardPrice) { result.totalPoints = state.rewardPrice; }
 
 	return result;
 }
@@ -115,6 +115,11 @@ async function buildRecipientObj(context) {
 	return state;
 }
 
+const capitalize = (s) => {
+	if (typeof s !== 'string') return '';
+	return s.charAt(0).toUpperCase() + s.slice(1);
+};
+
 async function buildSubtitle(product, userPoints) {
 	let res = '';
 	const productCost = product.score;
@@ -128,19 +133,21 @@ async function buildSubtitle(product, userPoints) {
 			res += `Te faltam ${missingPoints} pontos\n`;
 		}
 	}
-	if (product.description) res += product.description;
+	if (product.description) res += `${capitalize(product.description)}\n`;
+	if (product.category) res += `Categoria: ${capitalize(product.category)}\n`;
 	if (process.env.ENV === 'local') res += `\nID: ${product.id}`;
 
 	return res;
 }
 
 async function buildProductView(product = {}) {
-	let text = '';
-	if (product.name) text += `${product.name}\n`;
-	if (product.description) text += `${product.description}\n`;
-	if (product.points) text += `Custo: ${product.points} pontos`;
+	let res = '';
+	if (product.name) res += `${capitalize(product.name)}\n`;
+	if (product.description) res += `${capitalize(product.description)}\n`;
+	if (product.category) res += `Categoria: ${capitalize(product.category)}\n`;
+	if (product.score) res += `Custo unitário: ${product.score} pontos`;
 
-	return text;
+	return res;
 }
 
 /**
@@ -161,14 +168,16 @@ function paginate(array, pageSize, pageNumber) {
  * @param {integer} userPoins The points the user has
  * @returns {integer} - how many units the user can get
  */
-async function calculateProductUnits(productCost, userPoins) {
+function calculateProductUnits(productCost, userPoins) {
 	let count = 0;
-	// checks if one more unit fits the budget
-	while (userPoins >= (productCost * (count + 1)) && count < 3) { // count < 3, limits units in 3
+	let cost = productCost;
+
+	while (userPoins >= cost) {
+		cost += productCost;
 		count += 1;
 	}
 
-	return count;
+	return Math.min(count, 3); // limits result on 3
 }
 
 /**
@@ -211,6 +220,24 @@ async function buildSchoolMsg(schoolBalance, classroomBalance) {
 	return msg;
 }
 
+const orderRewards = list => list.sort((a, b) => a.score - b.score);
+const getSmallestPoint = rewards => rewards.reduce((a, b) => (a.score < b.score ? a : b)).score;
+const getAffortableRewards = (rewards, balance) => rewards.filter(x => x.score <= balance);
+const countKilos = (residues) => {
+	try {
+		let res = 0;
+		residues.forEach((e) => {
+			const { unitType } = e || '';
+			if (unitType.toLowerCase() === 'kilogram') {
+				if (typeof e.amount === 'number') res += e.amount;
+			}
+		});
+		return res;
+	} catch (error) {
+		sentryError('Erro ao contar Kilos', { error });
+		return null;
+	}
+};
 module.exports = {
 	buildPontoText,
 	Sentry,
@@ -230,4 +257,8 @@ module.exports = {
 	getCPFValid,
 	buildSchoolMsg,
 	handleErrorApi,
+	orderRewards,
+	getSmallestPoint,
+	countKilos,
+	getAffortableRewards,
 };

@@ -182,7 +182,7 @@ describe('myPoints', () => {
 			.replace('<KILOS>', context.state.userBalance.user_plastic)
 			.replace('<POINTS>', context.state.userBalance.balance));
 
-		const cheapest = await product.getSmallestPoint(rewards);
+		const cheapest = await help.getSmallestPoint(rewards);
 		await expect(context.sendText).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
 	});
 });

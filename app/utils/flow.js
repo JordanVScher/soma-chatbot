@@ -24,6 +24,7 @@ module.exports = {
 	},
 	myPoints: {
 		noPoints: 'Você ainda não tem nenhum ponto! ):',
+		onlyPoints: 'Você já conseguiu <POINTS> pontos!',
 		showPoints: 'Você já nos enviou o total de <KILOS> Kg(s), e com isso acumulou o total de <POINTS> pontos =)',
 		hasEnough: 'Você já pode realizar algumas trocas, deseja ver o que já é possível trocar?',
 		notEnough: 'Vc esta quase chegando, com <POINTS> pontos você já consegue fazer uma troca.',
@@ -35,23 +36,25 @@ module.exports = {
 		menuOptions: ['Entendi', 'Ver Todos'],
 		menuPostback: ['mainMenu', 'viewAllProducts'],
 	},
-	productQtd: {
+	rewardQtd: {
 		text1: 'Ebaa, quantas unidades de <PRODUTO> você quer?',
-		text2: 'Ok. Então, só para confirmar que entendi o seu pedido, você está pedindo <QTD> unidade(s) de <PRODUTO> e isso consumirá <PRICE> ponto(s) e assim sobrará <POINTS> para você. É isso mesmo?',
+		text2: 'Ok. Então, só para confirmar que entendi o seu pedido, você está pedindo <QTD> unidade(s) de <PRODUTO> e isso consumirá <PRICE> ponto(s) seus.\nDepois da troca, você ficará com <POINTS> ponto(s). É isso mesmo?',
 		menuOptions: ['Sim', 'Não'],
 		menuPostback: ['productFinish', 'productNo'],
 	},
 	productNo: {
 		text1: 'Ops, me desculpe. O que houve de errado?',
 		productError: 'Ok. Então vou te passar o número do Whatsapp da nossa equipe e eles vão te ajudar com isso.\nWhatsapp: <WHATSAPP>',
-		menuOptions: ['Erro com meus Pontos', 'Alterar Unidades'],
-		menuPostback: ['productError', 'productBtnClicked'],
+		menuOptions: ['Alterar Unidades', 'Alterar Produto', 'Cancelar Troca'],
+		menuPostback: ['productBtnClicked', 'viewUserProducts', 'mainMenu'], // ! - productBtnClicked will be replaced by the product the user chose previously
+		// menuOptions: ['Erro com meus Pontos', 'Alterar Unidades', 'Alterar Produto'],
+		// menuPostback: ['productError', 'productBtnClicked', 'viewUserProducts'],
 	},
 	showProducts: {
 		text1: 'Opa, vi aqui que você já possui pontos para trocar por alguns dos produtos disponíveis, quer que eu te mostre só estes produtos, ou prefere ver todos os produtos disponíveis para planejar suas próximas compras?',
 		noPoints1: 'É pra já...',
 		noPoints2: 'Esses são os produtos que temos disponíveis. Espero que te inspire a reciclar mais plásticos e trocar por pontos conosco =)',
-		menuOptions: ['Todos Produtos', 'Para Trocar =)'],
+		menuOptions: ['Todos os Produtos', 'Para Trocar'],
 		menuPostback: ['viewAllProducts', 'viewUserProducts'],
 	},
 	productFinish: {
