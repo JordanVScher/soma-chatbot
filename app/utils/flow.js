@@ -82,14 +82,14 @@ module.exports = {
 		invalid: 'CPF inválido. Tente novamente',
 		notFound: 'Não encontrei essa CPF nos meus cadastros.',
 		alreadyLinked: 'Esse CPF já está vinculado com um usuário!',
-		success: 'Sucesso! Te encontrei, a partir de agora você está vinculado(a).',
+		success: 'Sucesso! Te encontrei no meu sistema.',
 		menuOptions: ['Voltar'],
 		menuPostback: ['mainMenu'],
 	},
 	SMSToken: {
 		intro: 'Agora, para confirmar a sua identidade, entre com o token que acabamos de enviar no seu celular!',
 		ask: 'Entre com o seu token.',
-		success: 'Pronto, te encontrei. 😌\nAgora você poderá conversar comigo para trocar seus pontos por prêmios, clique nos botões abaixo para começar. 😊',
+		success: 'Pronto, terminamos. 😌\nAgora você poderá conversar comigo para trocar seus pontos por prêmios, clique nos botões abaixo para começar. 😊',
 		error: 'Esse token está incorreto. Tente novamente!',
 		dev: {
 			intro: 'Olá, testador em dev. Essa mensagem só vai aparecer no ambiente de dev, ignore a mensagem acima. ',
