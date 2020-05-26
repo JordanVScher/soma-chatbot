@@ -2,7 +2,6 @@ const dialogflow = require('dialogflow');
 const MaAPI = require('../chatbot_api');
 const { createIssue } = require('./send_issue');
 const { sendAnswer } = require('./sendAnswer');
-const { sendMainMenu } = require('./dialogs');
 const help = require('./helper');
 
 /* Initialize DialogFlow agent */
@@ -49,8 +48,8 @@ async function getExistingRes(res) {
 }
 
 async function checkPosition(context) {
-	await context.setState({ dialog: 'prompt' });
-
+	await context.setState({ dialog: '' });
+	console.log(`${context.state.sessionUser.name} caiu na intent ${context.state.intentName}`);
 	switch (context.state.intentName) {
 	case 'Default Welcome Intent':
 	case 'Greetings': // add specific intents here
@@ -70,6 +69,7 @@ async function checkPosition(context) {
 		break;
 	default: {
 		const knowledge = await MaAPI.getknowledgeBase(context.state.chatbotData.user_id, await getExistingRes(context.state.apiaiResp), context.session.user.id);
+		console.log(`Knowledge da intent ${context.state.intentName}:\n${JSON.stringify(knowledge, null, 2)}`);
 		await context.setState({ knowledge });
 		// check if there's at least one answer in knowledge_base
 		if (knowledge && knowledge.knowledge_base && knowledge.knowledge_base.length >= 1) {
@@ -77,7 +77,7 @@ async function checkPosition(context) {
 		} else { // no answers in knowledge_base (We know the entity but politician doesn't have a position)
 			await createIssue(context);
 		}
-		await sendMainMenu(context);
+		await context.setState({ dialog: 'mainMenu' });
 	}	break;
 	}
 }
