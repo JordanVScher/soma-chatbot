@@ -2,17 +2,26 @@ const somaAPI = require('../soma_api');
 const flow = require('./flow');
 const help = require('./helper');
 const attach = require('./attach');
-const product = require('./product');
 const assistenteAPI = require('../chatbot_api');
 const { sendMainMenu } = require('./mainMenu');
 
-async function schoolPoints(context, schoolData) {
+async function sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg) {
+	const kilos = help.countKilos(residues);
+
+	if (kilos) { // count how many kilos the user has to send the proper message
+		await context.sendText(fullMsg.replace('<KILOS>', kilos).replace('<POINTS>', userBalance));
+	} else { // in case there was an error with the kilos counting, send a message that has only the points
+		await context.sendText(pointMsg.replace('<POINTS>', userBalance));
+	}
+}
+
+async function schoolPoints(context) {
+	const schoolData = await somaAPI.getSchoolBalance(context.session.user.id, context.state.somaUser.id);
 	await context.setState({ schoolData });
 
-	if (schoolData && (schoolData.school_balance !== undefined && schoolData.school_balance !== null)) {
+	if (schoolData && schoolData.balance && schoolData.residues) {
 		await context.sendText(flow.schoolPoints.text1);
-		const msg = await help.buildSchoolMsg(schoolData.school_balance, schoolData.classroom_balance);
-		if (msg && typeof msg === 'string' && msg.length > 0) await context.sendText(msg);
+		await sendPointsMsg(context, schoolData.residues, schoolData.balance, flow.schoolPoints.text2, flow.schoolPoints.text3);
 	} else {
 		await context.sendText(flow.schoolPoints.failure);
 	}
@@ -178,13 +187,7 @@ async function myPoints(context) {
 			await context.sendText(flow.myPoints.noPoints);
 			await sendMainMenu(context);
 		} else {
-			const kilos = help.countKilos(userBalance.residues);
-
-			if (kilos) { // count how many kilos the user has to send the proper message
-				await context.sendText(flow.myPoints.showPoints.replace('<KILOS>', kilos).replace('<POINTS>', userBalance.balance));
-			} else { // in case there was an error with the kilos counting, send a message that has only the points
-				await context.sendText(flow.myPoints.onlyPoints.replace('<POINTS>', userBalance.balance));
-			}
+			await sendPointsMsg(context, userBalance.residues, userBalance.balance, flow.myPoints.showPoints, flow.myPoints.onlyPoints);
 
 			// find the cheapest reward
 			const cheapestScore = help.getSmallestPoint(rewards);

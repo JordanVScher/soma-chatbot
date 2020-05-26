@@ -198,27 +198,27 @@ async function buildQtdButtons(qtd, productCost) {
 
 const buildPontoText = async value => (value === 1 ? `${value} ponto` : `${value} pontos`);
 
-async function buildSchoolMsg(schoolBalance, classroomBalance) {
-	let msg;
+// async function buildSchoolMsg(schoolBalance, classroomBalance) {
+// 	let msg;
 
-	const school = parseInt(schoolBalance, 10);
+// 	const school = parseInt(schoolBalance, 10);
 
-	if (Number.isInteger(school)) {
-		if (school === 0) return 'A sua escola ainda não acumulou nenhum ponto 😟';
-		msg += `A sua escola já acumulou o total de ${await buildPontoText(school)}`;
-	}
+// 	if (Number.isInteger(school)) {
+// 		if (school === 0) return 'A sua escola ainda não acumulou nenhum ponto 😟';
+// 		msg += `A sua escola já acumulou o total de ${await buildPontoText(school)}`;
+// 	}
 
-	const classroom = parseInt(classroomBalance, 10);
+// 	const classroom = parseInt(classroomBalance, 10);
 
-	if (Number.isInteger(classroom)) {
-		if (classroom === 0) return `${msg} mas a sua turma ainda não acumulou nenhum ponto 😟`;
-		msg += `e sua turma contribuiu com o total de ${await buildPontoText(classroom)} para isso`;
-	}
+// 	if (Number.isInteger(classroom)) {
+// 		if (classroom === 0) return `${msg} mas a sua turma ainda não acumulou nenhum ponto 😟`;
+// 		msg += `e sua turma contribuiu com o total de ${await buildPontoText(classroom)} para isso`;
+// 	}
 
-	if (msg) msg += ' 😊';
+// 	if (msg) msg += ' 😊';
 
-	return msg;
-}
+// 	return msg;
+// }
 
 const orderRewards = list => list.sort((a, b) => a.score - b.score);
 const getSmallestPoint = rewards => rewards.reduce((a, b) => (a.score < b.score ? a : b)).score;
@@ -255,7 +255,6 @@ module.exports = {
 	buildTicket,
 	calculateProductUnits,
 	getCPFValid,
-	buildSchoolMsg,
 	handleErrorApi,
 	orderRewards,
 	getSmallestPoint,

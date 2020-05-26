@@ -62,6 +62,8 @@ module.exports = {
 	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
+		text2: 'A sua escola já acumulou o total de <POINTS> pontos e trocou <KILOS> kg(s).',
+		text3: 'A sua escola já acumulou o total de <POINTS> pontos.',
 		failure: 'Ops, não consegui carregar os dados da sua escola. Tente novamente mais tarde.',
 	},
 	issueText: {

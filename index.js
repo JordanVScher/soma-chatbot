@@ -107,7 +107,7 @@ module.exports = async function App(context) {
 			await dialogs.productFinish(context);
 			break;
 		case 'schoolPoints':
-			await dialogs.schoolPoints(context, await somaAPI.getSchoolBalance(context.state.somaUser.id));
+			await dialogs.schoolPoints(context);
 			break;
 		case 'join':
 			await context.sendText(flow.joinAsk.text1);

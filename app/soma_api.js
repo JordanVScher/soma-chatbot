@@ -83,7 +83,7 @@ module.exports = {
 
 		// return getAnswer(res);
 		return {
-			balance: 10000,
+			balance: 1000,
 			residues: [
 				{
 					name: 'BB',
@@ -105,13 +105,34 @@ module.exports = {
 	},
 
 	async getSchoolBalance(fbId, userId) {
-		const res = await request.get(`${somaURL}/v1/user/${userId}/school/balance`).set({
-			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
-			userId,
-		});
+		// const res = await request.get(`${somaURL}/v1/user/${userId}/school/balance`).set({
+		// 	'X-Api-Token': somaToken,
+		// 	'X-Fb-Id': fbId,
+		// 	userId,
+		// });
 
-		return getAnswer(res);
+		// return getAnswer(res);
+
+		return {
+			balance: 3000,
+			residues: [
+				{
+					name: 'BB',
+					amount: 40,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'AA',
+					amount: 35,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'VV',
+					amount: 15,
+					unitType: 'Gram',
+				},
+			],
+		};
 	},
 
 	async getUserRewards(fbId, userId) {
