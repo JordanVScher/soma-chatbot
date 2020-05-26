@@ -5,12 +5,14 @@ const help = require('./helper');
 const somaAPI = require('../soma_api');
 
 async function reloadUserData(context) {
-	const schoolData = await somaAPI.getSchoolBalance(context.session.user.id, context.state.somaUser.id);
+	if (context.state.somaUser && context.state.somaUser.id) {
+		const schoolData = await somaAPI.getSchoolBalance(context.session.user.id, context.state.somaUser.id);
 
-	if (schoolData && schoolData.balance) {
-		await context.setState({ schoolData });
-	} else {
-		await context.setState({ schoolData: null });
+		if (schoolData && schoolData.balance) {
+			await context.setState({ schoolData });
+		} else {
+			await context.setState({ schoolData: null });
+		}
 	}
 }
 

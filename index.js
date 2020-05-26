@@ -59,6 +59,7 @@ module.exports = async function App(context) {
 
 		switch (context.state.dialog) {
 		case 'greetings':
+			if (!context.state.somaUser) await context.setState({ somaUser: {} });
 			if (process.env.ENV !== 'local') await context.sendImage(flow.avatarImage);
 			await attach.sendMsgFromAssistente(context, 'greetings', [flow.greetings.text1]);
 			await sendMainMenu(context);

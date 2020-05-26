@@ -50,21 +50,28 @@ async function getExistingRes(res) {
 async function checkPosition(context) {
 	await context.setState({ dialog: '' });
 	console.log(`${context.state.sessionUser.name} caiu na intent ${context.state.intentName}`);
+
+	// check if user if linked before checking which intent user fell on
+	if (context.state.somaUser && context.state.somaUser.id) {
+		switch (context.state.intentName) {
+		case 'Meus Pontos':
+			await context.setState({ dialog: 'myPoints' });
+			break;
+		case 'Meus Produtos':
+			await context.setState({ dialog: 'showProducts' });
+			break;
+		case 'Pontos Escola':
+			await context.setState({ dialog: 'schoolPoints' });
+			break;
+		}
+	}
+
 	switch (context.state.intentName) {
 	case 'Default Welcome Intent':
-	case 'Greetings': // add specific intents here
+	case 'Greetings':
 		await context.setState({ dialog: 'greetings' });
 		break;
-	case 'Meus Pontos':
-		await context.setState({ dialog: 'myPoints' });
-		break;
-	case 'Meus Produtos':
-		await context.setState({ dialog: 'showProducts' });
-		break;
-	case 'Pontos Escola':
-		await context.setState({ dialog: 'schoolPoints' });
-		break;
-	case 'Fallback': // didn't understand what was typed
+	case 'Fallback':
 		await createIssue(context);
 		break;
 	default: {
