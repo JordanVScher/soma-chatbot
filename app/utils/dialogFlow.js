@@ -56,13 +56,13 @@ async function checkPosition(context) {
 		switch (context.state.intentName) {
 		case 'Meus Pontos':
 			await context.setState({ dialog: 'myPoints' });
-			break;
+			return;
 		case 'Meus Produtos':
 			await context.setState({ dialog: 'showProducts' });
-			break;
+			return;
 		case 'Pontos Escola':
 			await context.setState({ dialog: 'schoolPoints' });
-			break;
+			return;
 		}
 	}
 
