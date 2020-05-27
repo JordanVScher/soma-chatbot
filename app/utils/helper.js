@@ -78,7 +78,7 @@ async function handleRequestAnswer(response) {
 
 async function getCPFValid(cpf) {
 	const result = cpf.toString().replace(/[_.,-]/g, '');
-	if (!result || cpf.length < 11 || !/^\d+$/.test(result)) { return false; }
+	if (!result || result.length < 11 || !/^\d+$/.test(result)) { return false; }
 	return result;
 }
 
