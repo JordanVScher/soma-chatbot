@@ -96,6 +96,19 @@ module.exports = {
 			token: 'Abaixo está o token do SMS que você deverá enviar:\n\n',
 			error: 'Abaixo deveria estar o token do SMS pra você enviar mas aconteceu um erro. Avise um desenvolvedor!',
 		},
-
+	},
+	pagination: {
+		previous: {
+			title: 'Anterior',
+			subtitle: 'Ver produtos anteriores',
+			img: 'https://i.imgur.com/Woe8E1X.png',
+			btn: '⬅️ Anterior',
+		},
+		next: {
+			title: 'Próximo',
+			subtitle: 'Ver próximos produtos',
+			img: 'https://imgur.com/YNeLV04.png',
+			btn: 'Próximo ➡️',
+		},
 	},
 };

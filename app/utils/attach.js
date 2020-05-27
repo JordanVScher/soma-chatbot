@@ -2,6 +2,7 @@ const { sentryError } = require('./helper');
 const { buildSubtitle } = require('./helper');
 const { paginate } = require('./helper');
 const { orderRewards } = require('./helper');
+const { pagination } = require('./flow');
 
 function capQR(text) {
 	let result = text;
@@ -173,22 +174,22 @@ async function buildPagination(totalProducts, pageNumber) {
 async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 	if (pageNumber > 1) {
 		elements.unshift({
-			title: 'Anterior',
-			subtitle: 'Ver produtos anteriores',
-			// image_url: 'https://i.imgur.com/Woe8E1X.png',
+			title: pagination.previous.title,
+			subtitle: pagination.previous.subtitle,
+			// image_url: pagination.previous.img,
 			buttons: [
-				{ type: 'postback', title: '⬅️ Anterior', payload: `${payload}${pageNumber - 1}` },
+				{ type: 'postback', title: pagination.previous.btn, payload: `${payload}${pageNumber - 1}` },
 			],
 		});
 	}
 
 	if (hasNext) {
 		elements.push({
-			title: 'Próximo',
-			subtitle: 'Ver próximos produtos',
-			// image_url: 'https://imgur.com/YNeLV04.png',
+			title: pagination.next.title,
+			subtitle: pagination.next.subtitle,
+			// image_url: pagination.next.img,
 			buttons: [
-				{ type: 'postback', title: 'Próximo ➡️', payload: `${payload}${pageNumber + 1}` },
+				{ type: 'postback', title: pagination.next.btn, payload: `${payload}${pageNumber + 1}` },
 			],
 		});
 	}

@@ -1,4 +1,5 @@
 const attach = require('../app/utils/attach');
+const { pagination } = require('../app/utils/flow');
 
 describe('buildPagination', () => {
 	const pivot = 7;
@@ -59,7 +60,7 @@ describe('addPaginationButtons', () => {
 		const res = await attach.addPaginationButtons([...elements], pageNumber, true, payload);
 
 		await expect(res.length).toBe(2);
-		await expect(res[1].buttons[0].title).toBe('Próximo');
+		await expect(res[1].buttons[0].title).toBe(pagination.next.btn);
 		await expect(res[1].buttons[0].payload).toBe(`${payload}${pageNumber + 1}`);
 	});
 
@@ -68,7 +69,7 @@ describe('addPaginationButtons', () => {
 		const res = await attach.addPaginationButtons([...elements], pageNumber, false, payload);
 
 		await expect(res.length).toBe(2);
-		await expect(res[0].buttons[0].title).toBe('Anterior');
+		await expect(res[0].buttons[0].title).toBe(pagination.previous.btn);
 		await expect(res[0].buttons[0].payload).toBe(`${payload}${pageNumber - 1}`);
 	});
 
@@ -77,9 +78,9 @@ describe('addPaginationButtons', () => {
 		const res = await attach.addPaginationButtons([...elements], pageNumber, true, payload);
 
 		await expect(res.length).toBe(3);
-		await expect(res[0].buttons[0].title).toBe('Anterior');
+		await expect(res[0].buttons[0].title).toBe(pagination.previous.btn);
 		await expect(res[0].buttons[0].payload).toBe(`${payload}${pageNumber - 1}`);
-		await expect(res[2].buttons[0].title).toBe('Próximo');
+		await expect(res[2].buttons[0].title).toBe(pagination.next.btn);
 		await expect(res[2].buttons[0].payload).toBe(`${payload}${pageNumber + 1}`);
 	});
 });
