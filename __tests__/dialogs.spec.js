@@ -2,70 +2,100 @@ const cont = require('./mock_data/context');
 const flow = require('../app/utils/flow');
 const dialogs = require('../app/utils/dialogs');
 const attach = require('../app/utils/attach');
-const product = require('../app/utils/product');
 const { sendMainMenu } = require('../app/utils/mainMenu');
 const help = require('../app/utils/helper');
+const somaAPI = require('../app/soma_api');
+const somaApiData = require('./mock_data/somaApiData');
 
-jest.mock('../app/soma_api');
 jest.mock('../app/utils/checkQR');
 jest.mock('../app/utils/mainMenu');
 jest.mock('../app/utils/attach');
+jest.mock('../app/soma_api');
 
-const baseBalance = {
-	balance: 100,
-	user_plastic: 10,
-};
+jest
+	.spyOn(somaAPI, 'linkUser')
+	.mockImplementation((fbId, cpf) => somaApiData.linkUser[cpf]);
 
-const baseRewards = [
-	{
-		id: '1',
-		name: 'Caneta Azul',
-		description: 'Uma caneta azul comum',
-		score: 10,
-		img: 'www.foobar.com',
-	},
-	{
-		id: '2',
-		name: 'Estojo',
-		description: 'Um estojo',
-		score: 12,
-		img: 'www.foobar.com',
-	},
-];
+jest
+	.spyOn(somaAPI, 'activateToken')
+	.mockImplementation((fbId, cpf, token) => somaApiData.activateToken[token]);
 
-describe('linkUserAPI', () => {
-	const cpf = '123';
-	it('200 - CPF encontrado - mostra mensagem e manda pro menu', async () => {
+jest
+	.spyOn(somaAPI, 'getSchoolBalance')
+	.mockImplementation((fbId, userId) => somaApiData.getSchoolBalance[userId]);
+
+
+describe('sendPointsMsg', () => {
+	const fullMsg = flow.schoolPoints.text2;
+	const pointMsg = flow.schoolPoints.text3;
+
+	it('No kilos - send pointMsg', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		await dialogs.linkUserAPI(context, cpf, { statusCode: 200 });
+		const userBalance = 100;
+		const residues = [];
+		await dialogs.sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg);
 
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.success);
-		await expect(context.setState).toBeCalledWith({ cpf, linked: true });
-		await expect(context.setState).toBeCalledWith({ dialog: 'activateSMS' });
+		await expect(context.sendText).toBeCalledWith(pointMsg.replace('<POINTS>', userBalance));
 	});
 
-	it('404 - CPF não encontrado - mostra mensagem e pede de novo', async () => {
+	it('With kilos - send fullMsg', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		await dialogs.linkUserAPI(context, cpf, { statusCode: 404 });
+		const userBalance = 100;
+		const residues = [
+			{ name: 'foo', amount: 10, unitType: 'Kilogram' },
+			{ name: 'bar', amount: 15, unitType: 'Kilogram' },
+		];
+		const expectedKilos = 25;
+		await dialogs.sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg);
 
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
-		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+		await expect(context.sendText).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', userBalance));
+	});
+});
+
+describe('schoolPoints', () => {
+	const fullMsg = flow.schoolPoints.text2;
+	const pointMsg = flow.schoolPoints.text3;
+	it('schoolData has kilos and points - send full message and goes to menu', async () => {
+		const context = cont.quickReplyContext('greetings', 'greetings');
+		context.state.somaUser = { id: 1 };
+		const expectedKilos = 25;
+		const expectedBalance = 1000;
+
+		await dialogs.schoolPoints(context);
+
+		await expect(context.setState).toBeCalled();
+		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.text1);
+
+		await expect(context.sendText).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', expectedBalance));
+		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.failure);
+		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 
-	it('409 - CPF repetido - mostra mensagem e pede de novo', async () => {
+	it('schoolData has no kilos - send points message and goes to menu', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		await dialogs.linkUserAPI(context, cpf, { statusCode: 409 });
+		context.state.somaUser = { id: 2 };
+		const expectedBalance = 1000;
 
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.alreadyLinked);
-		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+		await dialogs.schoolPoints(context);
+
+		await expect(context.setState).toBeCalled();
+		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.text1);
+
+		await expect(context.sendText).toBeCalledWith(pointMsg.replace('<POINTS>', expectedBalance));
+		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.failure);
+		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 
-	it('400 - Outro status - mostra mensagem e pede de novo', async () => {
+	it('Failure retrieving schoolData - send failure message and goes to menu', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		await dialogs.linkUserAPI(context, cpf, { statusCode: 400 });
+		context.state.somaUser = { id: 3 };
 
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
-		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+		await dialogs.schoolPoints(context);
+
+		await expect(context.setState).toBeCalled();
+		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.text1);
+		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.failure);
+		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 });
 
@@ -79,173 +109,227 @@ describe('handleCPF', () => {
 		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
 	});
 
-	// it('CPF válido - verifica se cpf está cadastrado', async () => {
-	// 	const context = cont.quickReplyContext('greetings', 'greetings');
-	// 	context.state.whatWasTyped = '123.123.123-11';
-	// 	await dialogs.handleCPF(context);
+	it('CPF válido - verifica se cpf está cadastrado', async () => {
+		const context = cont.quickReplyContext('greetings', 'greetings');
+		context.state.whatWasTyped = '123.123.123-11';
+		await dialogs.handleCPF(context);
 
-	// 	await expect(context.sendText).not.toBeCalledWith(flow.joinAsk.invalid);
-	// });
+		await expect(context.sendText).not.toBeCalledWith(flow.joinAsk.invalid);
+	});
 });
 
-describe('schoolPoints', () => {
-	it('Fracasso ao recarregar os dados - manda mensagem de erro e vai pro menu', async () => {
+describe('linkUserAPI', () => {
+	it('200 - CPF encontrado - mostra mensagem e manda pro menu', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		const schoolData = null;
-		await dialogs.schoolPoints(context, schoolData);
+		const cpf = 1;
+		await dialogs.linkUserAPI(context, cpf);
 
-		await expect(context.setState).toBeCalledWith({ schoolData });
-		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.failure);
-		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
+		await expect(context.sendText).toBeCalledWith(flow.joinAsk.success);
+		await expect(context.setState).toBeCalledWith({ cpf, linked: true });
+		await expect(context.setState).toBeCalledWith({ dialog: 'activateSMS' });
 	});
 
-	it('Recarrega os dados - manda mensagem e vai pro menu', async () => {
+	it('404 - CPF não encontrado - mostra mensagem de erro e pede de novo', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
-		const schoolData = { school_balance: 0, classroom_balance: 10 };
+		const cpf = 2;
+		await dialogs.linkUserAPI(context, cpf);
 
-		await dialogs.schoolPoints(context, schoolData);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
+		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
+		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+	});
 
-		await expect(context.setState).toBeCalledWith({ schoolData });
-		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.text1);
-		const msg = await help.buildSchoolMsg(schoolData.school_balance, schoolData.classroom_balance);
-		await expect(context.sendText).toBeCalledWith(msg);
-		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
+	it('409 - CPF repetido - mostra mensagem de erro e pede de novo', async () => {
+		const context = cont.quickReplyContext('greetings', 'greetings');
+		const cpf = 3;
+		await dialogs.linkUserAPI(context, cpf);
+
+		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
+		await expect(context.sendText).toBeCalledWith(flow.joinAsk.alreadyLinked);
+		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+	});
+
+	it('400 - Outro status - mostra mensagem de erro e pede de novo', async () => {
+		const context = cont.quickReplyContext('greetings', 'greetings');
+		const cpf = 4;
+		await dialogs.linkUserAPI(context, cpf);
+
+		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
+		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
+		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
+	});
+});
+
+describe('handleSMS', () => {
+	it('Valid Token - manda mensagem, salva somaUser e vai pro menu', async () => {
+		const context = cont.quickReplyContext();
+		context.state.whatWasTyped = 1;
+		const somaUser = somaApiData.activateToken[context.state.whatWasTyped];
+		await dialogs.handleSMS(context);
+
+		await expect(somaAPI.activateToken).toBeCalledWith(context.session.user.id, context.state.cpf, context.state.whatWasTyped);
+		await expect(context.sendText).toBeCalledWith(flow.SMSToken.success);
+		await expect(context.setState).toBeCalledWith({ somaUser });
+		await expect(context.setState).toBeCalledWith({ dialog: 'mainMenu' });
+	});
+
+	it('invalid Token - manda mensagem de erro e tenta de novo', async () => {
+		const context = cont.quickReplyContext();
+		context.state.whatWasTyped = 2;
+		await dialogs.handleSMS(context);
+
+		await expect(somaAPI.activateToken).toBeCalledWith(context.session.user.id, context.state.cpf, context.state.whatWasTyped);
+		await expect(context.sendText).toBeCalledWith(flow.SMSToken.error);
+		await expect(context.setState).toBeCalledWith({ dialog: 'activateSMSAsk' });
 	});
 });
 
 describe('checkData', () => {
+	it('Tudo certo - segue fluxo', async () => {
+		const context = cont.quickReplyContext();
+		const userBalance = { balance: 10 };
+		const rewards = [{ id: 1 }];
+
+		const res = await dialogs.checkData(context, userBalance, rewards);
+		await expect(context.setState).toBeCalledWith({ userBalance, rewards });
+		await expect(res).toBe(true);
+	});
+
 	it('Falha ao carregar userBalance - manda msg de erro e volta pro menu', async () => {
-		const context = cont.quickReplyContext('foobar');
+		const context = cont.quickReplyContext();
 		const userBalance = null;
-		const rewards = null;
+		const rewards = [{ id: 1 }];
 
-		await dialogs.myPoints(context, userBalance, rewards);
-
+		const res = await dialogs.checkData(context, userBalance, rewards);
+		await expect(context.setState).toBeCalledWith({ userBalance, rewards });
 		await expect(context.sendText).toBeCalledWith(flow.myPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context);
+		await expect(res).toBe(false);
 	});
 
 	it('Falha ao carregar rewards - manda msg de erro e volta pro menu', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { foobar: true };
-		const rewards = { error: 'foobar' };
+		const context = cont.quickReplyContext();
+		const userBalance = { balance: 10 };
+		const rewards = null;
 
-		await dialogs.myPoints(context, userBalance, rewards);
-
+		const res = await dialogs.checkData(context, userBalance, rewards);
+		await expect(context.setState).toBeCalledWith({ userBalance, rewards });
 		await expect(context.sendText).toBeCalledWith(flow.myPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context);
+		await expect(res).toBe(false);
 	});
 });
 
-describe('myPoints', () => {
-	it('Usuário não tem nenhum ponto - Vê msg e vai pro menu', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		userBalance.balance = 0;
-		context.state.userBalance = userBalance;
-		const rewards = { ...baseRewards };
+// describe('myPoints', () => {
+// 	it('Usuário não tem nenhum ponto - Vê msg e vai pro menu', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		userBalance.balance = 0;
+// 		context.state.userBalance = userBalance;
+// 		const rewards = { ...baseRewards };
 
-		await dialogs.myPoints(context, userBalance, rewards);
+// 		await dialogs.myPoints(context, userBalance, rewards);
 
-		await expect(context.setState).toBeCalledWith({ userBalance });
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.noPoints);
-		await expect(sendMainMenu).toBeCalledWith(context);
-	});
+// 		await expect(context.setState).toBeCalledWith({ userBalance });
+// 		await expect(context.sendText).toBeCalledWith(flow.myPoints.noPoints);
+// 		await expect(sendMainMenu).toBeCalledWith(context);
+// 	});
 
-	it('Usuário pode comprar algo - Vê msg que oferece troca', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		userBalance.balance = 20;
-		context.state.userBalance = userBalance;
+// 	it('Usuário pode comprar algo - Vê msg que oferece troca', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		userBalance.balance = 20;
+// 		context.state.userBalance = userBalance;
 
-		await dialogs.myPoints(context, userBalance, rewards);
+// 		await dialogs.myPoints(context, userBalance, rewards);
 
-		await expect(context.setState).toBeCalledWith({ userBalance });
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.showPoints
-			.replace('<KILOS>', context.state.userBalance.user_plastic)
-			.replace('<POINTS>', context.state.userBalance.balance));
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
-	});
+// 		await expect(context.setState).toBeCalledWith({ userBalance });
+// 		await expect(context.sendText).toBeCalledWith(flow.myPoints.showPoints
+// 			.replace('<KILOS>', context.state.userBalance.user_plastic)
+// 			.replace('<POINTS>', context.state.userBalance.balance));
+// 		await expect(context.sendText).toBeCalledWith(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
+// 	});
 
-	it('Usuário não pode comprar nada - Vê msg que oferece ver todos', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		userBalance.balance = 1;
-		context.state.userBalance = userBalance;
+// 	it('Usuário não pode comprar nada - Vê msg que oferece ver todos', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		userBalance.balance = 1;
+// 		context.state.userBalance = userBalance;
 
-		await dialogs.myPoints(context, userBalance, rewards);
+// 		await dialogs.myPoints(context, userBalance, rewards);
 
-		await expect(context.setState).toBeCalledWith({ userBalance });
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.showPoints
-			.replace('<KILOS>', context.state.userBalance.user_plastic)
-			.replace('<POINTS>', context.state.userBalance.balance));
+// 		await expect(context.setState).toBeCalledWith({ userBalance });
+// 		await expect(context.sendText).toBeCalledWith(flow.myPoints.showPoints
+// 			.replace('<KILOS>', context.state.userBalance.user_plastic)
+// 			.replace('<POINTS>', context.state.userBalance.balance));
 
-		const cheapest = await help.getSmallestPoint(rewards);
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
-	});
-});
+// 		const cheapest = await help.getSmallestPoint(rewards);
+// 		await expect(context.sendText).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapest), await attach.getQR(flow.notEnough));
+// 	});
+// });
 
-describe('showProducts', () => {
-	it('Usuário pode comprar algo - Vê msg que oferece troca', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		userBalance.balance = 20;
-		context.state.userBalance = userBalance;
+// describe('showProducts', () => {
+// 	it('Usuário pode comprar algo - Vê msg que oferece troca', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		userBalance.balance = 20;
+// 		context.state.userBalance = userBalance;
 
-		await dialogs.showProducts(context, userBalance, rewards);
+// 		await dialogs.showProducts(context, userBalance, rewards);
 
-		await expect(context.setState).toBeCalledWith({ userBalance });
+// 		await expect(context.setState).toBeCalledWith({ userBalance });
 
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.text1, await attach.getQR(flow.showProducts));
-	});
+// 		await expect(context.sendText).toBeCalledWith(flow.showProducts.text1, await attach.getQR(flow.showProducts));
+// 	});
 
-	it('Usuário não pode comprar nada - Vê duas msgs e todos os produtos', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		userBalance.balance = 1;
-		context.state.userBalance = userBalance;
+// 	it('Usuário não pode comprar nada - Vê duas msgs e todos os produtos', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		userBalance.balance = 1;
+// 		context.state.userBalance = userBalance;
 
-		await dialogs.showProducts(context, userBalance, rewards);
+// 		await dialogs.showProducts(context, userBalance, rewards);
 
-		await expect(context.setState).toBeCalledWith({ userBalance });
+// 		await expect(context.setState).toBeCalledWith({ userBalance });
 
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints1);
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints2);
-		// viewAllProducts
-		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, context.state.userBalance.balance, rewards, 1);
-		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
-	});
-});
+// 		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints1);
+// 		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints2);
+// 		// viewAllProducts
+// 		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, context.state.userBalance.balance, rewards, 1);
+// 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
+// 	});
+// });
 
-describe('viewAllProducts', () => {
-	it('Sucesso - manda o carrousel com todos os produtos e o menu', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		const pageNumber = 1;
+// describe('viewAllProducts', () => {
+// 	it('Sucesso - manda o carrousel com todos os produtos e o menu', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		const pageNumber = 1;
 
-		await dialogs.viewAllProducts(context, userBalance, rewards, pageNumber);
+// 		await dialogs.viewAllProducts(context, userBalance, rewards, pageNumber);
 
-		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, userBalance.balance, rewards, pageNumber);
-		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
-	});
-});
+// 		await expect(attach.sendAllProductsCarrousel).toBeCalledWith(context, userBalance.balance, rewards, pageNumber);
+// 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
+// 	});
+// });
 
-describe('viewUserProducts', () => {
-	it('Sucesso - manda o carrousel com os produtos do e o menu', async () => {
-		const context = cont.quickReplyContext('foobar');
-		const userBalance = { ...baseBalance };
-		const rewards = [...baseRewards];
-		const pageNumber = 1;
+// describe('viewUserProducts', () => {
+// 	it('Sucesso - manda o carrousel com os produtos do e o menu', async () => {
+// 		const context = cont.quickReplyContext('foobar');
+// 		const userBalance = { ...baseBalance };
+// 		const rewards = [...baseRewards];
+// 		const pageNumber = 1;
 
 
-		await dialogs.viewUserProducts(context, userBalance, rewards, pageNumber);
+// 		await dialogs.viewUserProducts(context, userBalance, rewards, pageNumber);
 
-		await expect(attach.sendUserProductsCarrousel).toBeCalledWith(context, userBalance.balance, rewards, pageNumber);
-		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
-	});
-});
+// 		await expect(attach.sendUserProductsCarrousel).toBeCalledWith(context, userBalance.balance, rewards, pageNumber);
+// 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
+// 	});
+// });

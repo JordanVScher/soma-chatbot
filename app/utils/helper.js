@@ -89,9 +89,9 @@ async function buildTicket(state) {
 	// if (state.titularPhone) { result.telefone = state.titularPhone; }
 	if (state.titularMail) { result.mail = state.titularMail; }
 
-	if (state.desiredReward.name) { result.rewardName = state.desiredReward.name; }
-	if (state.desiredReward.id) { result.rewardID = state.desiredReward.id; }
-	if (state.rewardQtd) { result.rewardQtd = state.rewardQtd; }
+	if (state.desiredReward.name) { result.productName = state.desiredReward.name; }
+	if (state.desiredReward.id) { result.productID = state.desiredReward.id; }
+	if (state.rewardQtd) { result.productQtd = state.rewardQtd; }
 	if (state.rewardPrice) { result.totalPoints = state.rewardPrice; }
 
 	return result;

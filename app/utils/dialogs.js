@@ -5,13 +5,13 @@ const attach = require('./attach');
 const assistenteAPI = require('../chatbot_api');
 const { sendMainMenu } = require('./mainMenu');
 
-async function sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg) {
+async function sendPointsMsg(context, residues, balance, fullMsg, pointMsg) {
 	const kilos = help.countKilos(residues);
 
 	if (kilos) { // count how many kilos the user has to send the proper message
-		await context.sendText(fullMsg.replace('<KILOS>', kilos).replace('<POINTS>', userBalance));
+		await context.sendText(fullMsg.replace('<KILOS>', kilos).replace('<POINTS>', balance));
 	} else { // in case there was an error with the kilos counting, send a message that has only the points
-		await context.sendText(pointMsg.replace('<POINTS>', userBalance));
+		await context.sendText(pointMsg.replace('<POINTS>', balance));
 	}
 }
 
@@ -29,17 +29,8 @@ async function schoolPoints(context) {
 	await sendMainMenu(context, false, 3 * 1000);
 }
 
-async function checkFullName(context, stateName, successDialog, invalidDialog, reaskMsg) {
-	if (/^[a-zA-Z\s]+$/.test(context.state.whatWasTyped)) {
-		await context.setState({ [stateName]: context.state.whatWasTyped, dialog: successDialog });
-	} else {
-		if (reaskMsg) await context.sendText(reaskMsg);
-		await context.setState({ dialog: invalidDialog });
-	}
-}
-
-async function linkUserAPI(context, cpf, linkResponse) {
-	console.log('linkResponse', linkResponse);
+async function linkUserAPI(context, cpf) {
+	const linkResponse = await somaAPI.linkUser(context.session.user.id, cpf);
 	const { statusCode } = linkResponse;
 	switch (statusCode) {
 	case 200: // user was found successfully
@@ -69,7 +60,7 @@ async function handleCPF(context) {
 		await context.sendText(flow.joinAsk.invalid);
 		await context.setState({ dialog: 'joinAsk' });
 	} else {
-		await linkUserAPI(context, cpf, await somaAPI.linkUser(context.session.user.id, cpf));
+		await linkUserAPI(context, cpf);
 	}
 }
 
@@ -100,42 +91,16 @@ async function sendSMSTokenForDev(context) {
 	}
 }
 
-async function checkPhone(context, stateName, successDialog, invalidDialog, reaskMsg) {
-	const phone = await help.getPhoneValid(context.state.whatWasTyped);
-
-	if (phone) {
-		await context.setState({ [stateName]: phone, dialog: successDialog });
-		// await context.setState({ titularPhone: phone, dialog: 'askRevogarMail' });
-	} else {
-		if (reaskMsg) await context.sendText(flow.revogarDados.askRevogarPhoneFail);
-		// await context.sendText(flow.revogarDados.askRevogarPhoneFail);
-		await context.setState({ dialog: invalidDialog });
-		// await context.setState({ dialog: 'invalidPhone' });
-	}
-}
-
-async function checkEmail(context, stateName, successDialog, invalidDialog, reaskMsg) {
-	if (context.state.whatWasTyped.includes('@')) {
-		await context.setState({ [stateName]: context.state.whatWasTyped, dialog: successDialog });
-	} else {
-		if (reaskMsg)	await context.sendText(reaskMsg);
-		await context.setState({ dialog: invalidDialog });
-	}
-}
-
-async function handleReset(context) {
-	await context.setState({ dialog: 'greetings', quizEnded: false, sendShare: false });
-}
-
 // checks if both requests worked as expected
 async function checkData(context, userBalance, rewards) {
-	if (!userBalance || !userBalance.balance || !rewards) {
+	await context.setState({ userBalance, rewards });
+
+	if (!userBalance || !userBalance.balance || !rewards || !rewards[0]) {
 		await context.sendText(flow.myPoints.failure);
 		await sendMainMenu(context);
 		return false;
 	}
 
-	await context.setState({ userBalance, rewards });
 	return true;
 }
 
@@ -274,13 +239,43 @@ async function productFinish(context) {
 	await sendMainMenu(context);
 }
 
+// async function checkFullName(context, stateName, successDialog, invalidDialog, reaskMsg) {
+// 	if (/^[a-zA-Z\s]+$/.test(context.state.whatWasTyped)) {
+// 		await context.setState({ [stateName]: context.state.whatWasTyped, dialog: successDialog });
+// 	} else {
+// 		if (reaskMsg) await context.sendText(reaskMsg);
+// 		await context.setState({ dialog: invalidDialog });
+// 	}
+// }
+
+// async function checkPhone(context, stateName, successDialog, invalidDialog, reaskMsg) {
+// 	const phone = await help.getPhoneValid(context.state.whatWasTyped);
+
+// 	if (phone) {
+// 		await context.setState({ [stateName]: phone, dialog: successDialog });
+// 		// await context.setState({ titularPhone: phone, dialog: 'askRevogarMail' });
+// 	} else {
+// 		if (reaskMsg) await context.sendText(flow.revogarDados.askRevogarPhoneFail);
+// 		// await context.sendText(flow.revogarDados.askRevogarPhoneFail);
+// 		await context.setState({ dialog: invalidDialog });
+// 		// await context.setState({ dialog: 'invalidPhone' });
+// 	}
+// }
+
+// async function checkEmail(context, stateName, successDialog, invalidDialog, reaskMsg) {
+// 	if (context.state.whatWasTyped.includes('@')) {
+// 		await context.setState({ [stateName]: context.state.whatWasTyped, dialog: successDialog });
+// 	} else {
+// 		if (reaskMsg)	await context.sendText(reaskMsg);
+// 		await context.setState({ dialog: invalidDialog });
+// 	}
+// }
 
 module.exports = {
 	sendMainMenu,
-	checkFullName,
-	checkPhone,
-	checkEmail,
-	handleReset,
+	// checkFullName,
+	// checkPhone,
+	// checkEmail,
 	myPoints,
 	viewUserProducts,
 	viewAllProducts,
@@ -294,4 +289,6 @@ module.exports = {
 	schoolPoints,
 	sendSMSTokenForDev,
 	handleSMS,
+	sendPointsMsg,
+	checkData,
 };

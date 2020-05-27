@@ -3,7 +3,7 @@ const request = require('requisition');
 const somaURL = process.env.SOMA_URL;
 const somaToken = process.env.SOMA_TOKEN;
 
-async function getAnswer(response, params) {
+async function getAnswer(response, params = {}) {
 	let res = {};
 	const { options } = response;
 	const { statusCode } = response;
@@ -92,32 +92,12 @@ module.exports = {
 	},
 
 	async getUserBalance(fbId, userId) {
-		// const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
-		// 	'X-Api-Token': somaToken,
-		// 	'X-Fb-Id': fbId.toString(),
-		// 	userId,
-		// });
-		// return getAnswer(res);
-		return {
-			balance: 1000,
-			residues: [
-				{
-					name: 'BB',
-					amount: 10,
-					unitType: 'Kilogram',
-				},
-				{
-					name: 'AA',
-					amount: 15,
-					unitType: 'Kilogram',
-				},
-				{
-					name: 'VV',
-					amount: 15,
-					unitType: 'Gram',
-				},
-			],
-		};
+		const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
+			'X-Api-Token': somaToken,
+			'X-Fb-Id': fbId.toString(),
+			userId,
+		});
+		return getAnswer(res);
 	},
 
 	async getSchoolBalance(fbId, userId) {
