@@ -38,7 +38,7 @@ describe('buildMainMenu', () => {
 	it('Faz parte e tem dados da escola - vê botão Meus Pontos e Minha Escola', async () => {
 		const context = cont.quickReplyContext('greetings', 'greetings');
 		context.state.somaUser = { id: 1 };
-		context.state.schoolData = { name: 'foobar', points: '10', turmaPoints: '10' };
+		context.state.schoolData = { balance: 10 };
 		let res = await checkQR.buildMainMenu(context);
 		res = res.quick_replies;
 
