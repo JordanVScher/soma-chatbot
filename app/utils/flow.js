@@ -39,6 +39,8 @@ module.exports = {
 	rewardQtd: {
 		text1: 'Ebaa, quantas unidades de <PRODUTO> você quer?',
 		text2: 'Ok. Então, só para confirmar que entendi o seu pedido, você está pedindo <QTD> unidade(s) de <PRODUTO> e isso consumirá <PRICE> ponto(s) seus.\nDepois da troca, você ficará com <POINTS> ponto(s). É isso mesmo?',
+		notFound: 'Não consegui encontrar essa recompensa, acho que ele não está mais disponível. Que tal escolher outro? Temos muita coisa legal:',
+		priceChanged: 'Ops, parece que o preço mudou e você não tem mais pontos suficientes para essa recompensa! Tente novamente, por favor.',
 		menuOptions: ['Sim', 'Não'],
 		menuPostback: ['productFinish', 'productNo'],
 	},

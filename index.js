@@ -105,7 +105,7 @@ module.exports = async function App(context) {
 			await sendMainMenu(context);
 			break;
 		case 'productFinish':
-			await dialogs.productFinish(context);
+			await dialogs.productFinish(context, process.env.PRODUCT_TICKETID);
 			break;
 		case 'schoolPoints':
 			await dialogs.schoolPoints(context);

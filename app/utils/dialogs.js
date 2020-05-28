@@ -95,7 +95,7 @@ async function sendSMSTokenForDev(context) {
 async function checkData(context, userBalance, rewards) {
 	await context.setState({ userBalance, rewards });
 
-	if (!userBalance || !userBalance.balance || !rewards || !rewards[0]) {
+	if (!userBalance || userBalance.balance === null || typeof userBalance.balance === 'undefined' || !rewards || !rewards[0]) {
 		await context.sendText(flow.myPoints.failure);
 		await sendMainMenu(context);
 		return false;
@@ -111,7 +111,6 @@ async function viewUserProducts(context, pageNumber) {
 	if (await checkData(context, userBalance, rewards) === true) {
 		let userRewards = help.getAffortableRewards(rewards, userBalance.balance);
 		userRewards = help.orderRewards(userRewards);
-
 		await attach.sendUserProductsCarrousel(context, userBalance.balance, userRewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
 	}
@@ -120,6 +119,7 @@ async function viewUserProducts(context, pageNumber) {
 async function viewAllProducts(context, pageNumber) {
 	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
 	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
+
 	if (await checkData(context, userBalance, rewards) === true) {
 		await attach.sendAllProductsCarrousel(context, userBalance.balance, rewards, pageNumber);
 		await sendMainMenu(context, null, 1000 * 3);
@@ -171,6 +171,11 @@ async function productBuyHelp(context, button) {
 	await context.setState({ productBtnClicked: button, paginationNumber: 0 });
 }
 
+async function sendRewardtext(context, reward) {
+	const textToSend = await help.buildProductView(reward); // build details text
+	if (textToSend) await context.sendText(textToSend);
+}
+
 async function productBuy(context) {
 	const rewards = await somaAPI.getUserRewards(context.session.user.id, context.state.somaUser.id);
 	const userBalance = await somaAPI.getUserBalance(context.session.user.id, context.state.somaUser.id);
@@ -183,23 +188,23 @@ async function productBuy(context) {
 		if (desiredReward && desiredReward.id && desiredReward.score) {
 			// if (desiredReward.imageUrl) await context.sendImage(desiredReward.imageUrl); // send image if there's one url
 
-			const textToSend = await help.buildProductView(desiredReward); // build details text
-			if (textToSend) await context.sendText(textToSend);
+			await sendRewardtext(context, desiredReward);
 
 			// calculate and build quantity buttons
 			const desiredRewardQtd = await help.calculateProductUnits(desiredReward.score, userBalance.balance);
 			await context.setState({ desiredRewardQtd });
 
 			if (!desiredRewardQtd) {
-				await context.sendText('Ops, parece que o preço mudou e você não tem mais pontos suficientes para essa recompensa! Tente novamente, por favor.');
-				await viewUserProducts(context);
+				await context.sendText(flow.rewardQtd.priceChanged);
+				await viewAllProducts(context, 1);
 			} else {
 				const qtdButtons = await help.buildQtdButtons(desiredRewardQtd, desiredReward.score);
 				await context.setState({ qtdButtons });
 				await context.sendText(flow.rewardQtd.text1.replace('<PRODUTO>', desiredReward.name),	await attach.buildQtdButtons(context.state.qtdButtons, 3, 1));
 			}
 		} else {
-			await context.sendText('Não consegui encontrar essa recompensa, acho que ele não está mais disponível. Que tal escolher outro? Temos muita coisa legal:');
+			await context.sendText(flow.rewardQtd.notFound);
+			await viewAllProducts(context, 1);
 		}
 	}
 }
@@ -216,11 +221,11 @@ async function rewardQtd(context) {
 	await attach.getQR(flow.rewardQtd));
 }
 
-async function productFinish(context) {
-	const ticketID = process.env.PRODUCT_TICKETID || '';
+async function productFinish(context, ticketID) {
 	try {
 		await context.setState({ chatbotTickets: await assistenteAPI.getTicketTypes(context.state.chatbotData.organization_chatbot_id) });
 		const { id } = context.state.chatbotTickets.ticket_types.find(x => x.ticket_type_id && x.ticket_type_id.toString() === ticketID.toString());
+		console.log('id', id);
 		const res = await assistenteAPI.postNewTicket(context.state.chatbotData.organization_chatbot_id, context.session.user.id, id, await help.buildTicket(context.state));
 		if (!res || !res.id) {
 			console.log(context.state.sessionUser.name);
@@ -291,4 +296,5 @@ module.exports = {
 	handleSMS,
 	sendPointsMsg,
 	checkData,
+	sendRewardtext,
 };
