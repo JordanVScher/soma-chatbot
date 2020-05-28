@@ -92,12 +92,32 @@ module.exports = {
 	},
 
 	async getUserBalance(fbId, userId) {
-		const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
-			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId.toString(),
-			userId,
-		});
-		return getAnswer(res);
+		// const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
+		// 	'X-Api-Token': somaToken,
+		// 	'X-Fb-Id': fbId.toString(),
+		// 	userId,
+		// });
+		// return getAnswer(res);
+		return {
+			balance: 1500,
+			residues: [
+				{
+					name: 'BB',
+					amount: 50,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'AA',
+					amount: 70,
+					unitType: 'Kilogram',
+				},
+				{
+					name: 'VV',
+					amount: 15,
+					unitType: 'Gram',
+				},
+			],
+		};
 	},
 
 	async getSchoolBalance(fbId, userId) {
@@ -110,21 +130,21 @@ module.exports = {
 		// return getAnswer(res);
 
 		return {
-			balance: 3000,
+			balance: 10000,
 			residues: [
 				{
 					name: 'BB',
-					amount: 40,
+					amount: 400,
 					unitType: 'Kilogram',
 				},
 				{
 					name: 'AA',
-					amount: 35,
+					amount: 3500,
 					unitType: 'Kilogram',
 				},
 				{
 					name: 'VV',
-					amount: 15,
+					amount: 1500,
 					unitType: 'Gram',
 				},
 			],
