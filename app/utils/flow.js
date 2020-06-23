@@ -62,6 +62,8 @@ module.exports = {
 	},
 	productFinish: {
 		text1: 'Recebemos o seu pedido com sucesso! Logo, estaremos entrando em contato para te dar maiores informações!',
+		text2: 'O número do seu pedido de troca é #<TICKET_ID>.',
+		error: 'Tive um erro ao salvar o seu pedido. Tente novamente mais tarde.',
 	},
 	schoolPoints: {
 		text1: 'Só um segundo, vou consultar aqui no meu banco de dados!',
