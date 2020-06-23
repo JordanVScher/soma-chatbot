@@ -11,6 +11,10 @@ function sentryError(msg, err) {
 	if (process.env.ENV !== 'local') Sentry.captureMessage({ msg, err });
 }
 
+function addDot(x) {
+	return x && x.toString() ? x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : x;
+}
+
 // async function addChar(a, b, position) { return a.substring(0, position) + b + a.substring(position); }
 
 // separates string in the first dot on the second half of the string
@@ -124,13 +128,13 @@ async function buildSubtitle(product, userPoints) {
 	let res = '';
 	const productCost = product.score;
 
-	if (productCost) res += `Pontos: ${productCost}\n`;
+	if (productCost) res += `Pontos: ${addDot(productCost)}\n`;
 	if (userPoints < productCost) {
 		const missingPoints = productCost - userPoints;
 		if (missingPoints === 1) {
 			res += `Te falta só ${missingPoints} ponto\n`;
 		} else if (missingPoints > 1) {
-			res += `Te faltam ${missingPoints} pontos\n`;
+			res += `Te faltam ${addDot(missingPoints)} pontos\n`;
 		}
 	}
 	if (product.description) res += `${capitalize(product.description)}\n`;
@@ -145,7 +149,7 @@ async function buildProductView(product = {}) {
 	if (product.name) res += `${capitalize(product.name)}\n`;
 	if (product.description) res += `${capitalize(product.description)}\n`;
 	if (product.category) res += `Categoria: ${capitalize(product.category)}\n`;
-	if (product.score) res += `Custo unitário: ${product.score} pontos`;
+	if (product.score) res += `Custo unitário: ${addDot(product.score)} pontos`;
 
 	return res;
 }
@@ -196,7 +200,7 @@ async function buildQtdButtons(qtd, productCost) {
 	return buttons;
 }
 
-const buildPontoText = async value => (value === 1 ? `${value} ponto` : `${value} pontos`);
+const buildPontoText = async value => (value === 1 ? `${value} ponto` : `${addDot(value)} pontos`);
 
 // async function buildSchoolMsg(schoolBalance, classroomBalance) {
 // 	let msg;
@@ -238,6 +242,7 @@ const countKilos = (residues) => {
 		return null;
 	}
 };
+
 module.exports = {
 	buildPontoText,
 	Sentry,
@@ -260,4 +265,5 @@ module.exports = {
 	getSmallestPoint,
 	countKilos,
 	getAffortableRewards,
+	addDot,
 };

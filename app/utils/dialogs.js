@@ -9,9 +9,9 @@ async function sendPointsMsg(context, residues, balance, fullMsg, pointMsg) {
 	const kilos = help.countKilos(residues);
 
 	if (kilos) { // count how many kilos the user has to send the proper message
-		await context.sendText(fullMsg.replace('<KILOS>', kilos).replace('<POINTS>', balance));
+		await context.sendText(fullMsg.replace('<KILOS>', help.addDot(kilos)).replace('<POINTS>', help.addDot(balance)));
 	} else { // in case there was an error with the kilos counting, send a message that has only the points
-		await context.sendText(pointMsg.replace('<POINTS>', balance));
+		await context.sendText(pointMsg.replace('<POINTS>', help.addDot(balance)));
 	}
 }
 
@@ -160,7 +160,7 @@ async function myPoints(context) {
 			if (userBalance.balance >= cheapestScore) { // can the user get the cheapest reward whith his points?
 				await context.sendText(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
 			} else {
-				await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', cheapestScore), await attach.getQR(flow.notEnough));
+				await context.sendText(flow.myPoints.notEnough.replace('<POINTS>', help.addDot(cheapestScore)), await attach.getQR(flow.notEnough));
 			}
 		}
 	}
@@ -216,8 +216,8 @@ async function rewardQtd(context) {
 	await context.sendText(flow.rewardQtd.text2
 		.replace('<QTD>', context.state.rewardQtd)
 		.replace('<PRODUTO>', context.state.desiredReward.name)
-		.replace('<PRICE>', context.state.rewardPrice)
-		.replace('<POINTS>', context.state.userPointsLeft),
+		.replace('<PRICE>', help.addDot(context.state.rewardPrice))
+		.replace('<POINTS>', help.addDot(context.state.userPointsLeft)),
 	await attach.getQR(flow.rewardQtd));
 }
 

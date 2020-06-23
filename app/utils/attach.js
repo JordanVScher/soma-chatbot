@@ -1,7 +1,4 @@
-const { sentryError } = require('./helper');
-const { buildSubtitle } = require('./helper');
-const { paginate } = require('./helper');
-const { orderRewards } = require('./helper');
+const help = require('./helper');
 const { pagination } = require('./flow');
 
 function capQR(text) {
@@ -154,7 +151,7 @@ async function sendMsgFromAssistente(context, code, defaultMsgs) {
 			}
 		}
 	} catch (error) {
-		sentryError('Erro em sendMsgFromAssistente', error);
+		help.sentryError('Erro em sendMsgFromAssistente', error);
 	}
 }
 
@@ -199,7 +196,7 @@ async function addPaginationButtons(elements, pageNumber, hasNext, payload) {
 
 async function sendAllProductsCarrousel(context, userPoints, productList, pageNumber) {
 	let elements = [];
-	const products = orderRewards(productList);
+	const products = help.orderRewards(productList);
 	const totalProducts = products.length;
 
 	const { startAt, limit } = await buildPagination(totalProducts, pageNumber);
@@ -207,7 +204,7 @@ async function sendAllProductsCarrousel(context, userPoints, productList, pageNu
 	for (let i = startAt; i <= limit; i++) {
 		const e = products[i];
 		if (e && e.score) {
-			const subtitle = await buildSubtitle(e, userPoints);
+			const subtitle = await help.buildSubtitle(e, userPoints);
 			const buttons = [];
 			if (userPoints >= e.score) {
 				buttons.push({ type: 'postback', title: 'Trocar', payload: `productBuy${e.id}` });
@@ -246,7 +243,7 @@ async function sendUserProductsCarrousel(context, userPoints, productList, pageN
 	for (let i = startAt; i < limit; i++) {
 		const e = productList[i];
 		if (userPoints >= e.score) {
-			const subtitle = await buildSubtitle(e, userPoints);
+			const subtitle = await help.buildSubtitle(e, userPoints);
 
 			elements.push({
 				title: e.name,
@@ -278,11 +275,11 @@ async function sendUserProductsCarrousel(context, userPoints, productList, pageN
  * @param {integer} page_number The number of the page, needed for the button payload
  */
 async function buildQtdButtons(buttons, pageSize, pageNumber) {
-	const btns = await paginate(buttons, pageSize, pageNumber);
+	const btns = await help.paginate(buttons, pageSize, pageNumber);
 	const res = [];
 	for (let i = 0; i < btns.length; i++) {
 		const e = btns[i];
-		res.push({ content_type: 'text', title: e, payload: `rewardQtd${i + 1}` });
+		res.push({ content_type: 'text', title: help.addDot(e), payload: `rewardQtd${i + 1}` });
 	}
 
 	// if the first element of buttons is different from res, it's not the first page, adds pagination button
