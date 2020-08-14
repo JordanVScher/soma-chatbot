@@ -6,10 +6,9 @@ const { associatesLabelToUser } = require('./app/utils/postback');
 
 async function getFBIDJson() { // eslint-disable-line
 	const result = {};
-
 	await fs.readdirSync(testFolder).forEach(async (file) => {
 		const obj = JSON.parse(await fs.readFileSync(testFolder + file, 'utf8'));
-		result[obj.user.name] = obj.user.id;
+		result[obj._state.sessionUser.name] = obj.user.id;
 	});
 
 	return result;
