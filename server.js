@@ -13,6 +13,16 @@ const port = Number(process.env.API_PORT) || 5000;
 
 const handle = app.getRequestHandler();
 
+const { sequelize } = require('./app/server/models/index');
+
+if (process.env.TEST !== 'true') {
+	sequelize.authenticate().then(() => {
+		console.log('PSQL Connection has been established successfully.');
+	}).catch((err) => {
+		console.error('Unable to connect to the database:', err);
+	});
+}
+
 app.prepare().then(() => {
 	const server = express();
 
