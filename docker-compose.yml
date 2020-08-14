@@ -1,0 +1,12 @@
+version: "2"
+
+services:
+  app:
+    container_name: 'soma-chatbot'
+    build: 
+        context: .
+        dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${API_PORT}:${API_PORT}"
+

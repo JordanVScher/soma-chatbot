@@ -16,7 +16,8 @@ async function getFBIDJson() { // eslint-disable-line
 }
 
 async function getNameFBID(req, res) {
-	const body = JSON.parse(req.body || '{}');
+	const { body } = req;
+
 	if (!body || !body.security_token) {
 		res.status(400); res.send('Param security_token is required!');
 	} else {
