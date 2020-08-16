@@ -3,7 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const broadcast = require('./utils/broadcast');
 const { sentryError } = require('./utils/helper');
-const usersBroadcast = require('./server/models').users_broadcast;
+const { usersBroadcast } = require('./server/models/index');
 
 const testFolder = './.sessions/';
 const integerRegex = /^-?[0-9]+$/;

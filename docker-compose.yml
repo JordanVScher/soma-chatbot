@@ -1,13 +1,15 @@
 version: "2"
-
 services:
   app:
-    container_name: 'soma-chatbot'
-    build: 
-        context: .
-        dockerfile: ./Dockerfile
+    image: appcivico/soma-chatbot
+    container_name: soma-chatbot
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     restart: unless-stopped
     ports:
-      - "${API_PORT}:${API_PORT}"
+      - "${PORT}:${PORT}"
     network_mode: "bridge"
-
+    # volumes:
+    #   - .:/home/node/app
+    #   - /home/node/app/node_modules

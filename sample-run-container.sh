@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Local .env
+if [ -f .env ]; then
+    # Load Environment Variables
+    export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+    # For instance, will be example_kaggle_key
+fi
+
+echo $PAGE
+
 # arquivo de exemplo para iniciar o container
 export SOURCE_DIR='/home/jordan/soma-chatbot-homol'
 export DATA_DIR='/tmp/soma-chatbot-homol/data/'
@@ -8,10 +17,10 @@ export DATA_DIR='/tmp/soma-chatbot-homol/data/'
 export DOCKER_LAN_IP=$(ifconfig docker0 | grep 'inet addr:' | awk '{ split($2,a,":"); print a[2] }')
 
 # porta que sera feito o bind
-export LISTEN_PORT=2003
 
-docker run --name soma-chatbot \
+
+docker run --name $CONTAINER_NAME \
  -v $SOURCE_DIR:/src -v $DATA_DR:/data \
- -p $DOCKER_LAN_IP:$LISTEN_PORT:2700 \
+ -p $DOCKER_LAN_IP:$PORT:$PORT \
  --cpu-shares=512 \
- --memory 1800m -dit --restart unless-stopped appcivico/soma-chatbot
+ --memory 1800m -dit --restart unless-stopped $IMAGE_NAME
