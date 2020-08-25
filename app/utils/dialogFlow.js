@@ -75,7 +75,7 @@ async function checkPosition(context) {
 		await createIssue(context);
 		break;
 	default: {
-		const knowledge = await MaAPI.getknowledgeBase(context.state.chatbotData.user_id, await getExistingRes(context.state.apiaiResp), context.session.user.id);
+		const knowledge = await MaAPI.getknowledgeBase(context.state.chatbotData.user_id, await getExistingRes(context.state.apiaiResp), context.state.fbID);
 		console.log(`Knowledge da intent ${context.state.intentName}:\n${JSON.stringify(knowledge, null, 2)}`);
 		await context.setState({ knowledge });
 		// check if there's at least one answer in knowledge_base
@@ -92,7 +92,7 @@ async function checkPosition(context) {
 async function dialogFlow(context) {
 	console.log(`\n${context.state.sessionUser.name} digitou ${context.event.message.text} - DF Status: ${context.state.chatbotData.use_dialogflow}`);
 	if (context.state.chatbotData.use_dialogflow === 1) { // check if 'politician' is using dialogFlow
-		await context.setState({ apiaiResp: await textRequestDF(await help.formatDialogFlow(context.state.whatWasTyped), context.session.user.id) });
+		await context.setState({ apiaiResp: await textRequestDF(await help.formatDialogFlow(context.state.whatWasTyped), context.state.fbID) });
 		if (context.state.apiaiResp[0].queryResult.intent) {
 			await context.setState({ intentName: context.state.apiaiResp[0].queryResult.intent.displayName || '' }); // intent name
 			await context.setState({ resultParameters: await getEntity(context.state.apiaiResp) }); // entities

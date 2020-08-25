@@ -6,7 +6,7 @@ const somaAPI = require('../soma_api');
 
 async function reloadUserData(context) {
 	if (context.state.somaUser && context.state.somaUser.id) {
-		const schoolData = await somaAPI.getSchoolBalance(context.session.user.id, context.state.somaUser.id);
+		const schoolData = await somaAPI.getSchoolBalance(context.state.fbID, context.state.somaUser.id);
 
 		if (schoolData && schoolData.balance) {
 			await context.setState({ schoolData });
@@ -23,7 +23,7 @@ async function sendMainMenu(context, text, time = 1000 * 6) {
 
 	await reloadUserData(context);
 
-	await context.sendText(textToSend, await checkQR.buildMainMenu(context));
+	await context.sendMsg(textToSend, await checkQR.buildMainMenu(context));
 }
 
 module.exports = { sendMainMenu };

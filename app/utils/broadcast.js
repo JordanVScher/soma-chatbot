@@ -17,7 +17,7 @@ const broadcastMenu = [{
 }];
 
 async function sendBroadcastAluna(USER_ID, textMsg, QR = broadcastMenu) {
-	const result = await client.sendText(USER_ID.toString(), textMsg, { quick_replies: QR }).then(resp => resp).catch((err) => {
+	const result = await client.sendMsg(USER_ID.toString(), textMsg, { quick_replies: QR }).then(resp => resp).catch((err) => {
 		sentryError(`Erro em sendBroadcastAluna - ${USER_ID}`, err);
 		return err;
 	});

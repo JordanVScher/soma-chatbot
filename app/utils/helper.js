@@ -106,7 +106,7 @@ function getRandomArray(array) {
 }
 async function buildRecipientObj(context) {
 	const state = {
-		fb_id: context.session.user.id,
+		fb_id: context.state.fbID,
 		name: context.state.sessionUser.name,
 		picture: context.state.sessionUser.profilePic,
 		// origin_dialog: 'greetings',
@@ -139,7 +139,7 @@ async function buildSubtitle(product, userPoints) {
 	}
 	if (product.description) res += `${capitalize(product.description)}\n`;
 	if (product.category) res += `Categoria: ${capitalize(product.category)}\n`;
-	if (process.env.ENV === 'local') res += `\nID: ${product.id}`;
+	// if (process.env.ENV === 'local') res += `\nID: ${product.id}`;
 
 	return res;
 }

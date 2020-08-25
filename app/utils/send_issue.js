@@ -19,16 +19,16 @@ async function createIssue(context) {
 	// check if text is not empty and not on the blacklist
 	const cleanString = await formatString(context.state.whatWasTyped);
 	if (cleanString && cleanString.length > 0 && !blacklist.includes(cleanString)) {
-		const issueResponse = await chatbotAPI.postIssue(context.state.chatbotData.user_id, context.session.user.id, context.state.whatWasTyped,
+		const issueResponse = await chatbotAPI.postIssue(context.state.chatbotData.user_id, context.state.fbID, context.state.whatWasTyped,
 			{}, context.state.chatbotData.issue_active);
 
 		if (issueResponse && issueResponse.id) {
-			await context.sendText(await getRandomArray(issueText.success));
+			await context.sendMsg(await getRandomArray(issueText.success));
 			console.log('created issue? true');
 			return true;
 		}
 	}
-	await context.sendText(issueText.failure);
+	await context.sendMsg(issueText.failure);
 	console.log('created issue? false');
 	return false;
 }

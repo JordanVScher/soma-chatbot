@@ -133,7 +133,7 @@ async function sendShare(context, cardData) {
 	});
 }
 
-async function sendMsgFromAssistente(context, code, defaultMsgs) {
+async function sendMsgFromAssistente(context, code, defaultMsgs, imgUrl) {
 	try {
 		const answers = context.state && context.state.chatbotData && context.state.chatbotData.answers ? context.state.chatbotData.answers : false;
 		let msgToSend;
@@ -144,10 +144,10 @@ async function sendMsgFromAssistente(context, code, defaultMsgs) {
 		}
 
 		if (msgToSend && msgToSend.length > 0) {
-			await context.sendText(msgToSend);
+			await context.Image(imgUrl, msgToSend);
 		} else if (defaultMsgs && defaultMsgs.length > 0) {
 			for (const msg of defaultMsgs) { // eslint-disable-line
-				await context.sendText(msg);
+				await context.Image(imgUrl, msg);
 			}
 		}
 	} catch (error) {

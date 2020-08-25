@@ -43,7 +43,7 @@ app.prepare().then(() => {
 	});
 
 	server.get('/name-id', async (req, res) => {
-		await requests.getNameFBID(req, res);
+		await requests.getNamefbID(req, res);
 	});
 
 	server.post('/soma-broadcast', async (req, res) => {

@@ -55,18 +55,18 @@ async function getUsers() {
 	return result;
 }
 
-async function findUserByFBID(FBID) { // eslint-disable-line
+async function findUserByfbID(fbID) { // eslint-disable-line
 	let res = false;
 	await fs.readdirSync(testFolder).forEach(async (file) => {
 		const obj = JSON.parse(await fs.readFileSync(testFolder + file, 'utf8'));
-		if (!res && FBID.toString() === obj.user.id.toString()) {
+		if (!res && fbID.toString() === obj.user.id.toString()) {
 			res = true;
 		}
 	});
 
 	return res;
 }
-async function findUserByFBIDList(users) { // eslint-disable-line
+async function findUserByfbIDList(users) { // eslint-disable-line
 	const res = [];
 	await fs.readdirSync(testFolder).forEach(async (file) => {
 		const obj = JSON.parse(await fs.readFileSync(testFolder + file, 'utf8'));
@@ -127,7 +127,7 @@ async function handler(res, body) {
 	if (Array.isArray(users) === true && users.length > 0) {
 		const id = await addToQueue(body, res);
 		if (id) {
-			const usersToSend = await findUserByFBIDList(users.map(String));
+			const usersToSend = await findUserByfbIDList(users.map(String));
 			let notFound;
 			if (usersToSend.length !== users.length) { notFound = await users.filter(x => !usersToSend.find(y => y.id === x)); }
 			await sendMultipleMessages(usersToSend, text, res, notFound, id);

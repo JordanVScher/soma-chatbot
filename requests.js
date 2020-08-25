@@ -4,7 +4,7 @@ const testFolder = './.sessions/';
 const fs = require('fs');
 const { associatesLabelToUser } = require('./app/utils/postback');
 
-async function getFBIDJson() { // eslint-disable-line
+async function getfbIDJson() { // eslint-disable-line
 	const result = {};
 	await fs.readdirSync(testFolder).forEach(async (file) => {
 		const obj = JSON.parse(await fs.readFileSync(testFolder + file, 'utf8'));
@@ -14,7 +14,7 @@ async function getFBIDJson() { // eslint-disable-line
 	return result;
 }
 
-async function getNameFBID(req, res) {
+async function getNamefbID(req, res) {
 	const { body } = req;
 
 	if (!body || !body.security_token) {
@@ -24,7 +24,7 @@ async function getNameFBID(req, res) {
 		if (securityToken !== process.env.SECURITY_TOKEN_MA) {
 			res.status(401); res.send('Unauthorized!');
 		} else {
-			const result = await getFBIDJson();
+			const result = await getfbIDJson();
 			if (result) {
 				res.status(200); res.send(result);
 			} else {
@@ -52,5 +52,5 @@ async function addLabel(req, res) {
 
 
 module.exports = {
-	getNameFBID, addLabel,
+	getNamefbID, addLabel,
 };

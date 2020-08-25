@@ -16,11 +16,11 @@ jest.mock('../app/chatbot_api');
 
 jest
 	.spyOn(somaAPI, 'linkUser')
-	.mockImplementation((fbId, cpf) => somaApiData.linkUser[cpf]);
+	.mockImplementation((fbID, cpf) => somaApiData.linkUser[cpf]);
 
 jest
 	.spyOn(somaAPI, 'activateToken')
-	.mockImplementation((fbId, cpf, token) => somaApiData.activateToken[token]);
+	.mockImplementation((fbID, cpf, token) => somaApiData.activateToken[token]);
 
 jest
 	.spyOn(somaAPI, 'getUserRewards')
@@ -28,11 +28,11 @@ jest
 
 jest
 	.spyOn(somaAPI, 'getUserBalance')
-	.mockImplementation((fbId, userId) => somaApiData.getUserBalance[userId]);
+	.mockImplementation((fbID, userId) => somaApiData.getUserBalance[userId]);
 
 jest
 	.spyOn(somaAPI, 'getSchoolBalance')
-	.mockImplementation((fbId, userId) => somaApiData.getSchoolBalance[userId]);
+	.mockImplementation((fbID, userId) => somaApiData.getSchoolBalance[userId]);
 
 jest
 	.spyOn(assistenteAPI, 'getTicketTypes')
@@ -52,7 +52,7 @@ describe('sendPointsMsg', () => {
 		const residues = [];
 		await dialogs.sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg);
 
-		await expect(context.sendText).toBeCalledWith(pointMsg.replace('<POINTS>', userBalance));
+		await expect(context.sendMsg).toBeCalledWith(pointMsg.replace('<POINTS>', userBalance));
 	});
 
 	it('With kilos - send fullMsg', async () => {
@@ -65,7 +65,7 @@ describe('sendPointsMsg', () => {
 		const expectedKilos = 25;
 		await dialogs.sendPointsMsg(context, residues, userBalance, fullMsg, pointMsg);
 
-		await expect(context.sendText).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', userBalance));
+		await expect(context.sendMsg).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', userBalance));
 	});
 });
 
@@ -81,10 +81,10 @@ describe('schoolPoints', () => {
 		await dialogs.schoolPoints(context);
 
 		await expect(context.setState).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.text1);
+		await expect(context.sendMsg).toBeCalledWith(flow.schoolPoints.text1);
 
-		await expect(context.sendText).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', expectedBalance));
-		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.failure);
+		await expect(context.sendMsg).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', expectedBalance));
+		await expect(context.sendMsg).not.toBeCalledWith(flow.schoolPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 
@@ -96,10 +96,10 @@ describe('schoolPoints', () => {
 		await dialogs.schoolPoints(context);
 
 		await expect(context.setState).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.text1);
+		await expect(context.sendMsg).toBeCalledWith(flow.schoolPoints.text1);
 
-		await expect(context.sendText).toBeCalledWith(pointMsg.replace('<POINTS>', expectedBalance));
-		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.failure);
+		await expect(context.sendMsg).toBeCalledWith(pointMsg.replace('<POINTS>', expectedBalance));
+		await expect(context.sendMsg).not.toBeCalledWith(flow.schoolPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 
@@ -110,8 +110,8 @@ describe('schoolPoints', () => {
 		await dialogs.schoolPoints(context);
 
 		await expect(context.setState).toBeCalled();
-		await expect(context.sendText).not.toBeCalledWith(flow.schoolPoints.text1);
-		await expect(context.sendText).toBeCalledWith(flow.schoolPoints.failure);
+		await expect(context.sendMsg).not.toBeCalledWith(flow.schoolPoints.text1);
+		await expect(context.sendMsg).toBeCalledWith(flow.schoolPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context, false, 3 * 1000);
 	});
 });
@@ -122,7 +122,7 @@ describe('handleCPF', () => {
 		context.state.whatWasTyped = 'foobar';
 		await dialogs.handleCPF(context);
 
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.invalid);
+		await expect(context.sendMsg).toBeCalledWith(flow.joinAsk.invalid);
 		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
 	});
 
@@ -131,7 +131,7 @@ describe('handleCPF', () => {
 		context.state.whatWasTyped = '123.123.123-11';
 		await dialogs.handleCPF(context);
 
-		await expect(context.sendText).not.toBeCalledWith(flow.joinAsk.invalid);
+		await expect(context.sendMsg).not.toBeCalledWith(flow.joinAsk.invalid);
 	});
 });
 
@@ -141,8 +141,8 @@ describe('linkUserAPI', () => {
 		const cpf = 1;
 		await dialogs.linkUserAPI(context, cpf);
 
-		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.success);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.state.fbID, cpf);
+		await expect(context.sendMsg).toBeCalledWith(flow.joinAsk.success);
 		await expect(context.setState).toBeCalledWith({ cpf, linked: true });
 		await expect(context.setState).toBeCalledWith({ dialog: 'activateSMS' });
 	});
@@ -152,8 +152,8 @@ describe('linkUserAPI', () => {
 		const cpf = 2;
 		await dialogs.linkUserAPI(context, cpf);
 
-		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.state.fbID, cpf);
+		await expect(context.sendMsg).toBeCalledWith(flow.joinAsk.notFound);
 		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
 	});
 
@@ -162,8 +162,8 @@ describe('linkUserAPI', () => {
 		const cpf = 3;
 		await dialogs.linkUserAPI(context, cpf);
 
-		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.alreadyLinked);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.state.fbID, cpf);
+		await expect(context.sendMsg).toBeCalledWith(flow.joinAsk.alreadyLinked);
 		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
 	});
 
@@ -172,8 +172,8 @@ describe('linkUserAPI', () => {
 		const cpf = 4;
 		await dialogs.linkUserAPI(context, cpf);
 
-		await expect(somaAPI.linkUser).toBeCalledWith(context.session.user.id, cpf);
-		await expect(context.sendText).toBeCalledWith(flow.joinAsk.notFound);
+		await expect(somaAPI.linkUser).toBeCalledWith(context.state.fbID, cpf);
+		await expect(context.sendMsg).toBeCalledWith(flow.joinAsk.notFound);
 		await expect(context.setState).toBeCalledWith({ dialog: 'joinAsk' });
 	});
 });
@@ -185,8 +185,8 @@ describe('handleSMS', () => {
 		const somaUser = somaApiData.activateToken[context.state.whatWasTyped];
 		await dialogs.handleSMS(context);
 
-		await expect(somaAPI.activateToken).toBeCalledWith(context.session.user.id, context.state.cpf, context.state.whatWasTyped);
-		await expect(context.sendText).toBeCalledWith(flow.SMSToken.success);
+		await expect(somaAPI.activateToken).toBeCalledWith(context.state.fbID, context.state.cpf, context.state.whatWasTyped);
+		await expect(context.sendMsg).toBeCalledWith(flow.SMSToken.success);
 		await expect(context.setState).toBeCalledWith({ somaUser });
 		await expect(context.setState).toBeCalledWith({ dialog: 'mainMenu' });
 	});
@@ -196,8 +196,8 @@ describe('handleSMS', () => {
 		context.state.whatWasTyped = 2;
 		await dialogs.handleSMS(context);
 
-		await expect(somaAPI.activateToken).toBeCalledWith(context.session.user.id, context.state.cpf, context.state.whatWasTyped);
-		await expect(context.sendText).toBeCalledWith(flow.SMSToken.error);
+		await expect(somaAPI.activateToken).toBeCalledWith(context.state.fbID, context.state.cpf, context.state.whatWasTyped);
+		await expect(context.sendMsg).toBeCalledWith(flow.SMSToken.error);
 		await expect(context.setState).toBeCalledWith({ dialog: 'activateSMSAsk' });
 	});
 });
@@ -220,7 +220,7 @@ describe('checkData', () => {
 
 		const res = await dialogs.checkData(context, userBalance, rewards);
 		await expect(context.setState).toBeCalledWith({ userBalance, rewards });
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.failure);
+		await expect(context.sendMsg).toBeCalledWith(flow.myPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context);
 		await expect(res).toBe(false);
 	});
@@ -232,7 +232,7 @@ describe('checkData', () => {
 
 		const res = await dialogs.checkData(context, userBalance, rewards);
 		await expect(context.setState).toBeCalledWith({ userBalance, rewards });
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.failure);
+		await expect(context.sendMsg).toBeCalledWith(flow.myPoints.failure);
 		await expect(sendMainMenu).toBeCalledWith(context);
 		await expect(res).toBe(false);
 	});
@@ -247,8 +247,8 @@ describe('viewUserProducts', () => {
 		jest.spyOn(help, 'orderRewards');
 
 		await dialogs.viewUserProducts(context, 1);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(help.getAffortableRewards).toBeCalled();
 		await expect(help.orderRewards).toBeCalled();
@@ -261,8 +261,8 @@ describe('viewUserProducts', () => {
 		context.state.somaUser = { id: null };
 
 		await dialogs.viewUserProducts(context, 1);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(sendMainMenu).toBeCalledWith(context);
 	});
@@ -274,8 +274,8 @@ describe('viewAllProducts', () => {
 		context.state.somaUser = { id: 1 };
 
 		await dialogs.viewAllProducts(context, 1);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(attach.sendUserProductsCarrousel).toBeCalled();
 		await expect(sendMainMenu).toBeCalledWith(context, null, 1000 * 3);
@@ -286,8 +286,8 @@ describe('viewAllProducts', () => {
 		context.state.somaUser = { id: null };
 
 		await dialogs.viewAllProducts(context, 1);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(sendMainMenu).toBeCalledWith(context);
 	});
@@ -302,11 +302,11 @@ describe('showProducts', () => {
 		context.state.somaUser = { id: 1 };
 
 		await dialogs.showProducts(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(help.getSmallestPoint).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.text1, await attach.getQR(flow.showProducts));
+		await expect(context.sendMsg).toBeCalledWith(flow.showProducts.text1, await attach.getQR(flow.showProducts));
 	});
 
 	it('Usuário não consegue trocar - vê duas mensagens e Carrousel como todos os produtos', async () => {
@@ -314,12 +314,12 @@ describe('showProducts', () => {
 		context.state.somaUser = { id: 2 };
 
 		await dialogs.showProducts(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(help.getSmallestPoint).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints1);
-		await expect(context.sendText).toBeCalledWith(flow.showProducts.noPoints2);
+		await expect(context.sendMsg).toBeCalledWith(flow.showProducts.noPoints1);
+		await expect(context.sendMsg).toBeCalledWith(flow.showProducts.noPoints2);
 		await expect(dialogs.viewAllProducts).toBeCalled();
 	});
 
@@ -328,8 +328,8 @@ describe('showProducts', () => {
 		context.state.somaUser = { id: null };
 
 		await dialogs.showProducts(context, 1);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(sendMainMenu).toBeCalledWith(context);
 	});
@@ -348,12 +348,12 @@ describe('myPoints', () => {
 		const expectedBalance = 10000;
 
 		await dialogs.myPoints(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
-		await expect(context.sendText).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', expectedBalance));
+		await expect(context.sendMsg).toBeCalledWith(fullMsg.replace('<KILOS>', expectedKilos).replace('<POINTS>', expectedBalance));
 		await expect(help.getSmallestPoint).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
+		await expect(context.sendMsg).toBeCalledWith(flow.myPoints.hasEnough, await attach.getQR(flow.myPoints));
 	});
 
 	it('Usuário não pode comprar e não tem kilos - vê mensagem de pontos e outras opções', async () => {
@@ -363,12 +363,12 @@ describe('myPoints', () => {
 		const cheapestScore = 500;
 
 		await dialogs.myPoints(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
-		await expect(context.sendText).toBeCalledWith(pointMsg.replace('<POINTS>', expectedBalance));
+		await expect(context.sendMsg).toBeCalledWith(pointMsg.replace('<POINTS>', expectedBalance));
 		await expect(help.getSmallestPoint).toBeCalled();
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapestScore), await attach.getQR(flow.notEnough));
+		await expect(context.sendMsg).toBeCalledWith(flow.myPoints.notEnough.replace('<POINTS>', cheapestScore), await attach.getQR(flow.notEnough));
 	});
 
 	it('Usuário não tem ponto nenhum - vê mensagem avisando e vai pro menu', async () => {
@@ -376,10 +376,10 @@ describe('myPoints', () => {
 		context.state.somaUser = { id: 3 };
 
 		await dialogs.myPoints(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
-		await expect(context.sendText).toBeCalledWith(flow.myPoints.noPoints);
+		await expect(context.sendMsg).toBeCalledWith(flow.myPoints.noPoints);
 		await expect(sendMainMenu).toBeCalledWith(context);
 	});
 });
@@ -403,7 +403,7 @@ describe('sendRewardtext', () => {
 		const reward = { id: 1, name: 'Foobar' };
 		await dialogs.sendRewardtext(context, reward);
 		await expect(help.buildProductView).toBeCalledWith(reward);
-		await expect(context.sendText).toBeCalled();
+		await expect(context.sendMsg).toBeCalled();
 	});
 
 	it('Não tem recompensa - Não manda mensagem', async () => {
@@ -411,7 +411,7 @@ describe('sendRewardtext', () => {
 		const reward = {};
 		await dialogs.sendRewardtext(context, reward);
 		await expect(help.buildProductView).toBeCalledWith(reward);
-		await expect(context.sendText).not.toBeCalled();
+		await expect(context.sendMsg).not.toBeCalled();
 	});
 });
 
@@ -427,14 +427,14 @@ describe('productBuy', () => {
 		const desiredRewardName = somaApiData.getUserRewards[0].name;
 
 		await dialogs.productBuy(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(dialogs.sendRewardtext).toBeCalled();
 		await expect(help.calculateProductUnits).toBeCalled();
 		await expect(help.buildQtdButtons).toBeCalled();
 
-		await expect(context.sendText).toBeCalledWith(
+		await expect(context.sendMsg).toBeCalledWith(
 			flow.rewardQtd.text1.replace('<PRODUTO>', desiredRewardName), await attach.buildQtdButtons(context.state.qtdButtons, 3, 1),
 		);
 	});
@@ -445,13 +445,13 @@ describe('productBuy', () => {
 		context.state.productId = 1;
 
 		await dialogs.productBuy(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
 		await expect(dialogs.sendRewardtext).toBeCalled();
 		await expect(help.calculateProductUnits).toBeCalled();
 
-		await expect(context.sendText).toBeCalledWith(flow.rewardQtd.priceChanged);
+		await expect(context.sendMsg).toBeCalledWith(flow.rewardQtd.priceChanged);
 		await expect(dialogs.viewAllProducts).toBeCalled();
 	});
 
@@ -462,10 +462,10 @@ describe('productBuy', () => {
 		context.state.productId = 2666;
 
 		await dialogs.productBuy(context);
-		await expect(somaAPI.getUserRewards).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
-		await expect(somaAPI.getUserBalance).toBeCalledWith(context.session.user.id, context.state.somaUser.id);
+		await expect(somaAPI.getUserRewards).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
+		await expect(somaAPI.getUserBalance).toBeCalledWith(context.state.fbID, context.state.somaUser.id);
 
-		await expect(context.sendText).toBeCalledWith(flow.rewardQtd.notFound);
+		await expect(context.sendMsg).toBeCalledWith(flow.rewardQtd.notFound);
 		await expect(dialogs.viewAllProducts).toBeCalled();
 	});
 });
@@ -481,6 +481,6 @@ describe('rewardQtd', () => {
 		await expect(context.setState).toBeCalledWith({ rewardPrice: context.state.desiredReward.score * context.state.rewardQtd });
 		await expect(context.setState).toBeCalledWith({ userPointsLeft: context.state.userBalance.balance - context.state.rewardPrice });
 
-		await expect(context.sendText).toBeCalled();
+		await expect(context.sendMsg).toBeCalled();
 	});
 });

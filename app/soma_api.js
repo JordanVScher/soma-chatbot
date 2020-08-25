@@ -41,60 +41,60 @@ module.exports = {
 		return getAnswer(res);
 	},
 
-	async linkUser(fbId, cpf) {
+	async linkUser(fbID, cpf) {
 		const params = { cpf };
 		const res = await request.post(`${somaURL}/v1/link-user`).set({
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 		}).send(params);
 
 		return getAnswer(res, params);
 	},
 
-	async unlinkUser(fbId, cpf) {
+	async unlinkUser(fbID, cpf) {
 		const params = { cpf };
 		const res = await request.delete(`${somaURL}/v1/unlink-user`).set({
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 		}).send(params);
 
 		return getAnswer(res, params);
 	},
 
-	async getToken(fbId, cpf) {
+	async getToken(fbID, cpf) {
 		const res = await request.get(`${somaURL}/v1/token/${cpf}`).set({
 			cpf,
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 		});
 
 		return getAnswer(res);
 	},
 
-	async activateToken(fbId, cpf, code) {
+	async activateToken(fbID, cpf, code) {
 		const params = { cpf, code };
 		const res = await request.post(`${somaURL}/v1/activate`).set({
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 		}).send({ cpf, code });
 
 		return getAnswer(res, params);
 	},
 
-	async getUser(fbId, userId) {
+	async getUser(fbID, userId) {
 		const res = await request.get(`${somaURL}/v1/user/${userId}`).set({
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 			userId,
 		});
 
 		return getAnswer(res);
 	},
 
-	async getUserBalance(fbId, userId) {
+	async getUserBalance(fbID, userId) {
 		// const res = await request.get(`${somaURL}/v1/user/${userId}/balance`).set({
 		// 	'X-Api-Token': somaToken,
-		// 	'X-Fb-Id': fbId.toString(),
+		// 	'X-Fb-Id': fbID.toString(),
 		// 	userId,
 		// });
 		// return getAnswer(res);
@@ -120,10 +120,10 @@ module.exports = {
 		};
 	},
 
-	async getSchoolBalance(fbId, userId) {
+	async getSchoolBalance(fbID, userId) {
 		// const res = await request.get(`${somaURL}/v1/user/${userId}/school/balance`).set({
 		// 	'X-Api-Token': somaToken,
-		// 	'X-Fb-Id': fbId,
+		// 	'X-Fb-Id': fbID,
 		// 	userId,
 		// });
 
@@ -151,10 +151,10 @@ module.exports = {
 		};
 	},
 
-	async getUserRewards(fbId, userId) {
+	async getUserRewards(fbID, userId) {
 		const res = await request.get(`${somaURL}/v1/reward/${userId}`).set({
 			'X-Api-Token': somaToken,
-			'X-Fb-Id': fbId,
+			'X-Fb-Id': fbID,
 			userId,
 		});
 

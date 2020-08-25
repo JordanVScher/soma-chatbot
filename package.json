@@ -20,7 +20,8 @@
     "dremove": "pm2 remove \"soma-dev\"",
     "webhook": "npx bottender messenger webhook set",
     "profileGet": "npx bottender messenger profile get",
-    "profileSet": "npx bottender messenger profile set"
+    "profileSet": "npx bottender messenger profile set",
+    "bottender:dev": "npx bottender dev"
   },
   "dependencies": {
     "@sentry/node": "^5.21.1",
