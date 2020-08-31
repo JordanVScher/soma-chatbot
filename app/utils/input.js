@@ -60,7 +60,7 @@ async function handleText(context, newText) {
 
 	if (context.isWhatsapp()) {
 		if (!context.state.dialog) return context.setState({ dialog: 'greetings' });
-		if (['0', 'voltar', 'menu', 'reset', 'ajuda'].includes(context.state.whatWasTyped.toLowerCase())) {
+		if (['0', 'voltar', 'menu', 'reset', 'ajuda', 'oi'].includes(context.state.whatWasTyped.toLowerCase())) {
 			context.setState({ dialog: 'greetings' });
 			context.setState({ dialog: 'viewAllProducts' });
 			return null;
