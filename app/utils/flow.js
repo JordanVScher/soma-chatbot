@@ -1,5 +1,5 @@
 module.exports = {
-	avatarImage: 'https://gallery.mailchimp.com/926cb477483bcd8122304bc56/images/b35bd3b6-a0a0-4534-9d54-0f864dd172d3.jpg',
+	avatarImage: 'https://mcusercontent.com/926cb477483bcd8122304bc56/images/386d7350-9002-450d-ad9e-dd010a675dee.png',
 	getStarted: 'Olá! Eu sou o Robô do SO+MA Educação, e vou te ajudar nas suas duvidas sobre o programa.',
 	share: {
 		txt1: 'Encaminhe nosso bot!',
