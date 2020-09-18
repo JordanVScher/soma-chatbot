@@ -21,7 +21,8 @@
     "webhook": "npx bottender messenger webhook set",
     "profileGet": "npx bottender messenger profile get",
     "profileSet": "npx bottender messenger profile set",
-    "bottender:dev": "npx bottender dev"
+    "bottender:dev": "npx bottender dev",
+    "bottender:start": "npx bottender start"
   },
   "dependencies": {
     "@sentry/node": "^5.21.1",
